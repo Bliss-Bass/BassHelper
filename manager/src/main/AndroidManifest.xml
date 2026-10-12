@@ -70,7 +70,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:banner="@mipmap/banner"
+            android:banner="@drawable/banner"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
