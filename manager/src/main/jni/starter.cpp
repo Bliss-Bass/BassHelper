@@ -254,8 +254,11 @@ int main(int argc, char *argv[]) {
         fflush(stdout);
     }
 
-    if (apk_path.empty()) {
-        auto f = popen("pm path " PACKAGE_NAME, "r");
+    // pm path looks in user 0; headless system user mode installs apps for the foreground user only.
+    const char *pm_path_cmds[] = {"pm path " PACKAGE_NAME, "pm path --user current " PACKAGE_NAME};
+    for (auto cmd : pm_path_cmds) {
+        if (!apk_path.empty()) break;
+        auto f = popen(cmd, "r");
         if (f) {
             char line[PATH_MAX]{0};
             fgets(line, PATH_MAX, f);

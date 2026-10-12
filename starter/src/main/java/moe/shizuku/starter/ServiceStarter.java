@@ -77,7 +77,10 @@ public class ServiceStarter {
         service = result.first;
         token = result.second;
 
-        if (!sendBinder(service, token)) {
+        // Headless system user mode installs the manager for the foreground user only, not user 0.
+        int clientUserId = clientUserId(args);
+        if (!sendBinder(service, token, clientUserId, true)
+                && (clientUserId == 0 || !sendBinder(service, token, 0, true))) {
             System.exit(1);
         }
 
@@ -87,14 +90,21 @@ public class ServiceStarter {
         Log.i(TAG, "service exited");
     }
 
-    private static boolean sendBinder(IBinder binder, String token) {
-        return sendBinder(binder, token, true);
+    private static int clientUserId(String[] args) {
+        for (String arg : args) {
+            if (arg.startsWith("--uid=")) {
+                try {
+                    return Integer.parseInt(arg.substring("--uid=".length())) / 100000;
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        return 0;
     }
 
-    private static boolean sendBinder(IBinder binder, String token, boolean retry) {
+    private static boolean sendBinder(IBinder binder, String token, int userId, boolean retry) {
         String packageName = "com.blisscolabs.basshelper";
         String name = packageName + ".shizuku";
-        int userId = 0;
         IContentProvider provider = null;
 
         try {
@@ -112,7 +122,7 @@ public class ServiceStarter {
                     ActivityManagerApis.forceStopPackageNoThrow(packageName, userId);
                     Log.e(TAG, String.format("kill %s in user %d and try again", packageName, userId));
                     Thread.sleep(1000);
-                    return sendBinder(binder, token, false);
+                    return sendBinder(binder, token, userId, false);
                 }
                 return false;
             }

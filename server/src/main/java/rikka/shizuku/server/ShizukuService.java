@@ -72,8 +72,19 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
     }
 
+    /** User 0 first; headless system user mode (desktop builds) installs apps for the foreground user only. */
     public static ApplicationInfo getManagerApplicationInfo() {
-        return PackageManagerApis.getApplicationInfoNoThrow(MANAGER_APPLICATION_ID, 0, 0);
+        ApplicationInfo ai = PackageManagerApis.getApplicationInfoNoThrow(MANAGER_APPLICATION_ID, 0, 0);
+        if (ai != null) {
+            return ai;
+        }
+        for (int userId : UserManagerApis.getUserIdsNoThrow()) {
+            ai = PackageManagerApis.getApplicationInfoNoThrow(MANAGER_APPLICATION_ID, 0, userId);
+            if (ai != null) {
+                return ai;
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings({"FieldCanBeLocal"})
@@ -101,14 +112,14 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
 
         assert ai != null;
-        managerAppId = ai.uid;
+        managerAppId = UserHandleCompat.getAppId(ai.uid);
 
         configManager = getConfigManager();
         clientManager = getClientManager();
 
         ApkChangedObservers.start(ai.sourceDir, () -> {
             if (getManagerApplicationInfo() == null) {
-                LOGGER.w("manager app is uninstalled in user 0, exiting...");
+                LOGGER.w("manager app is uninstalled in every user, exiting...");
                 System.exit(ServerConstants.MANAGER_APP_NOT_FOUND);
             }
         });
