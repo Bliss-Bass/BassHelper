@@ -75,7 +75,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <!-- INFO instead of LAUNCHER: no app drawer entry, but App info's Open button and
+                     PackageManager.getLaunchIntentForPackage still reach this activity. -->
+                <category android:name="android.intent.category.INFO" />
 
                 <!-- 2023.08.03: Google play enforces that apps with LEANBACK_LAUNCHER Activity must be uploaded with App Bundle format, -->
                 <!-- and possibly additional review steps. To avoid problems, remove it temporarily. -->
