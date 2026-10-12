@@ -30,7 +30,6 @@ public class BinderSender {
     private static final Logger LOGGER = new Logger("BinderSender");
 
     private static final String PERMISSION_MANAGER = "com.blisscolabs.basshelper.permission.MANAGER";
-    private static final String PERMISSION = ServerConstants.PERMISSION;
 
     private static ShizukuService sShizukuService;
 
@@ -147,6 +146,11 @@ public class BinderSender {
 
         int userId = uid / 100000;
         for (String packageName : packages) {
+            if (BassAllowList.contains(packageName)) {
+                ShizukuService.sendBinderToUserApp(sShizukuService, packageName, userId);
+                return;
+            }
+
             PackageInfo pi = PackageManagerApis.getPackageInfoNoThrow(packageName, PackageManager.GET_PERMISSIONS, userId);
             if (pi == null || pi.requestedPermissions == null)
                 continue;
@@ -162,9 +166,6 @@ public class BinderSender {
                     ShizukuService.sendBinderToManger(sShizukuService, userId);
                     return;
                 }
-            } else if (ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
-                ShizukuService.sendBinderToUserApp(sShizukuService, packageName, userId);
-                return;
             }
         }
     }

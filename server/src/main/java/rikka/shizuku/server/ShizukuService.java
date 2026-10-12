@@ -9,10 +9,7 @@ import static rikka.shizuku.ShizukuApiConstants.BIND_APPLICATION_SERVER_SECONTEX
 import static rikka.shizuku.ShizukuApiConstants.BIND_APPLICATION_SERVER_UID;
 import static rikka.shizuku.ShizukuApiConstants.BIND_APPLICATION_SERVER_VERSION;
 import static rikka.shizuku.ShizukuApiConstants.BIND_APPLICATION_SHOULD_SHOW_REQUEST_PERMISSION_RATIONALE;
-import static rikka.shizuku.ShizukuApiConstants.REQUEST_PERMISSION_REPLY_ALLOWED;
-import static rikka.shizuku.ShizukuApiConstants.REQUEST_PERMISSION_REPLY_IS_ONETIME;
 import static rikka.shizuku.server.ServerConstants.MANAGER_APPLICATION_ID;
-import static rikka.shizuku.server.ServerConstants.PERMISSION;
 
 import android.content.Context;
 import android.content.IContentProvider;
@@ -20,7 +17,6 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.UserInfo;
 import android.ddm.DdmHandleAppName;
 import android.os.Binder;
 import android.os.Bundle;
@@ -39,9 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import kotlin.collections.ArraysKt;
 import moe.shizuku.api.BinderContainer;
-import moe.shizuku.common.util.BuildUtils;
 import moe.shizuku.common.util.OsUtils;
 import moe.shizuku.server.IShizukuApplication;
 import rikka.hidden.compat.ActivityManagerApis;
@@ -147,26 +141,12 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         return UserHandleCompat.getAppId(callingUid) == managerAppId;
     }
 
-    private int checkCallingPermission() {
-        try {
-            return ActivityManagerApis.checkPermission(ServerConstants.PERMISSION,
-                    Binder.getCallingPid(),
-                    Binder.getCallingUid());
-        } catch (Throwable tr) {
-            LOGGER.w(tr, "checkCallingPermission");
-            return PackageManager.PERMISSION_DENIED;
-        }
-    }
-
     @Override
     public boolean checkCallerPermission(String func, int callingUid, int callingPid, @Nullable ClientRecord clientRecord) {
         if (UserHandleCompat.getAppId(callingUid) == managerAppId) {
             return true;
         }
-        if (clientRecord == null && checkCallingPermission() == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        return false;
+        return clientRecord == null && BassAllowList.allowsUid(callingUid);
     }
 
     @Override
@@ -207,6 +187,10 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
 
         isManager = MANAGER_APPLICATION_ID.equals(requestPackageName);
+        if (!isManager && !BassAllowList.contains(requestPackageName)) {
+            LOGGER.w("Refusing %s (uid %d): not on Bass Helper's allow list", requestPackageName, callingUid);
+            throw new SecurityException(requestPackageName + " is not allowed to use Bass Helper");
+        }
 
         if (clientManager.findClient(callingUid, callingPid) == null) {
             synchronized (this) {
@@ -216,6 +200,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
                 LOGGER.w("Add client failed");
                 return;
             }
+            clientRecord.allowed = !isManager;
         }
 
         LOGGER.d("attachApplication: %s %d %d", requestPackageName, callingUid, callingPid);
@@ -254,168 +239,30 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
 
     @Override
     public void showPermissionConfirmation(int requestCode, @NonNull ClientRecord clientRecord, int callingUid, int callingPid, int userId) {
-        ApplicationInfo ai = PackageManagerApis.getApplicationInfoNoThrow(clientRecord.packageName, 0, userId);
-        if (ai == null) {
-            return;
-        }
-
-        PackageInfo pi = PackageManagerApis.getPackageInfoNoThrow(MANAGER_APPLICATION_ID, 0, userId);
-        UserInfo userInfo = UserManagerApis.getUserInfo(userId);
-        boolean isWorkProfileUser = BuildUtils.atLeast30() ?
-                "android.os.usertype.profile.MANAGED".equals(userInfo.userType) :
-                (userInfo.flags & UserInfo.FLAG_MANAGED_PROFILE) != 0;
-        if (pi == null && !isWorkProfileUser) {
-            LOGGER.w("Manager not found in non work profile user %d. Revoke permission", userId);
-            clientRecord.dispatchRequestPermissionResult(requestCode, false);
-            return;
-        }
-
-        Intent intent = new Intent(ServerConstants.REQUEST_PERMISSION_ACTION)
-                .setPackage(MANAGER_APPLICATION_ID)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
-                .putExtra("uid", callingUid)
-                .putExtra("pid", callingPid)
-                .putExtra("requestCode", requestCode)
-                .putExtra("applicationInfo", ai);
-        ActivityManagerApis.startActivityNoThrow(intent, null, isWorkProfileUser ? 0 : userId);
+        LOGGER.w("Refusing permission to %s (uid %d): not on Bass Helper's allow list", clientRecord.packageName, callingUid);
+        clientRecord.dispatchRequestPermissionResult(requestCode, false);
     }
 
     @Override
     public void dispatchPermissionConfirmationResult(int requestUid, int requestPid, int requestCode, Bundle data) throws RemoteException {
-        if (UserHandleCompat.getAppId(Binder.getCallingUid()) != managerAppId) {
-            LOGGER.w("dispatchPermissionConfirmationResult called not from the manager package");
-            return;
-        }
-
-        if (data == null) {
-            return;
-        }
-
-        boolean allowed = data.getBoolean(REQUEST_PERMISSION_REPLY_ALLOWED);
-        boolean onetime = data.getBoolean(REQUEST_PERMISSION_REPLY_IS_ONETIME);
-
-        LOGGER.i("dispatchPermissionConfirmationResult: uid=%d, pid=%d, requestCode=%d, allowed=%s, onetime=%s",
-                requestUid, requestPid, requestCode, Boolean.toString(allowed), Boolean.toString(onetime));
-
-        List<ClientRecord> records = clientManager.findClients(requestUid);
-        List<String> packages = new ArrayList<>();
-        if (records.isEmpty()) {
-            LOGGER.w("dispatchPermissionConfirmationResult: no client for uid %d was found", requestUid);
-        } else {
-            for (ClientRecord record : records) {
-                packages.add(record.packageName);
-                record.allowed = allowed;
-                if (record.pid == requestPid) {
-                    record.dispatchRequestPermissionResult(requestCode, allowed);
-                }
-            }
-        }
-
-        if (!onetime) {
-            configManager.update(requestUid, packages, ConfigManager.MASK_PERMISSION, allowed ? ConfigManager.FLAG_ALLOWED : ConfigManager.FLAG_DENIED);
-        }
-
-        if (!onetime && allowed) {
-            int userId = UserHandleCompat.getUserId(requestUid);
-
-            for (String packageName : PackageManagerApis.getPackagesForUidNoThrow(requestUid)) {
-                PackageInfo pi = PackageManagerApis.getPackageInfoNoThrow(packageName, PackageManager.GET_PERMISSIONS, userId);
-                if (pi == null || pi.requestedPermissions == null || !ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
-                    continue;
-                }
-
-                int deviceId = 0;//Context.DEVICE_ID_DEFAULT
-                if (allowed) {
-                    PermissionManagerApis.grantRuntimePermission(packageName, PERMISSION, userId);
-                } else {
-                    PermissionManagerApis.revokeRuntimePermission(packageName, PERMISSION, userId);
-                }
-            }
-        }
-    }
-
-    private int  getFlagsForUidInternal(int uid, int mask, boolean allowRuntimePermission) {
-        ShizukuConfig.PackageEntry entry = configManager.find(uid);
-        if (entry != null) {
-            return entry.flags & mask;
-        }
-
-        if (allowRuntimePermission && (mask & ConfigManager.MASK_PERMISSION) != 0) {
-            int userId = UserHandleCompat.getUserId(uid);
-            for (String packageName : PackageManagerApis.getPackagesForUidNoThrow(uid)) {
-                PackageInfo pi = PackageManagerApis.getPackageInfoNoThrow(packageName, PackageManager.GET_PERMISSIONS, userId);
-                if (pi == null || pi.requestedPermissions == null || !ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
-                    continue;
-                }
-
-                try {
-                    if (PermissionManagerApis.checkPermission(PERMISSION, uid) == PackageManager.PERMISSION_GRANTED) {
-                        return ConfigManager.FLAG_ALLOWED;
-                    }
-                } catch (Throwable e) {
-                    LOGGER.w("getFlagsForUid");
-                }
-            }
-        }
-        return 0;
+        LOGGER.w("dispatchPermissionConfirmationResult ignored: Bass Helper's clients are fixed at build time");
     }
 
     @Override
     public int getFlagsForUid(int uid, int mask) {
         if (UserHandleCompat.getAppId(Binder.getCallingUid()) != managerAppId) {
-            LOGGER.w("updateFlagsForUid is allowed to be called only from the manager");
+            LOGGER.w("getFlagsForUid is allowed to be called only from the manager");
             return 0;
         }
-        return getFlagsForUidInternal(uid, mask, true);
+        if ((mask & ConfigManager.MASK_PERMISSION) != 0 && BassAllowList.allowsUid(uid)) {
+            return ConfigManager.FLAG_ALLOWED;
+        }
+        return 0;
     }
 
     @Override
     public void updateFlagsForUid(int uid, int mask, int value) throws RemoteException {
-        if (UserHandleCompat.getAppId(Binder.getCallingUid()) != managerAppId) {
-            LOGGER.w("updateFlagsForUid is allowed to be called only from the manager");
-            return;
-        }
-
-        int userId = UserHandleCompat.getUserId(uid);
-
-        if ((mask & ConfigManager.MASK_PERMISSION) != 0) {
-            boolean allowed = (value & ConfigManager.FLAG_ALLOWED) != 0;
-            boolean denied = (value & ConfigManager.FLAG_DENIED) != 0;
-
-            List<ClientRecord> records = clientManager.findClients(uid);
-            for (ClientRecord record : records) {
-                if (allowed) {
-                    record.allowed = true;
-                } else {
-                    record.allowed = false;
-                    ActivityManagerApis.forceStopPackageNoThrow(record.packageName, UserHandleCompat.getUserId(record.uid));
-                    onPermissionRevoked(record.packageName);
-                }
-            }
-
-            for (String packageName : PackageManagerApis.getPackagesForUidNoThrow(uid)) {
-                PackageInfo pi = PackageManagerApis.getPackageInfoNoThrow(packageName, PackageManager.GET_PERMISSIONS, userId);
-                if (pi == null || pi.requestedPermissions == null || !ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
-                    continue;
-                }
-
-                int deviceId = 0;//Context.DEVICE_ID_DEFAULT
-                if (allowed) {
-                    PermissionManagerApis.grantRuntimePermission(packageName, PERMISSION, userId);
-                } else {
-                    PermissionManagerApis.revokeRuntimePermission(packageName, PERMISSION, userId);
-                }
-
-                // TODO kill user service using
-            }
-        }
-
-        configManager.update(uid, null, mask, value);
-    }
-
-    private void onPermissionRevoked(String packageName) {
-        // TODO add runtime permission listener
-        getUserServiceManager().removeUserServicesForPackage(packageName);
+        LOGGER.w("updateFlagsForUid ignored: Bass Helper's clients are fixed at build time");
     }
 
     private ParcelableListSlice<PackageInfo> getApplications(int userId) {
@@ -428,29 +275,12 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
 
         for (int user : users) {
-            for (PackageInfo pi : PackageManagerApis.getInstalledPackagesNoThrow(PackageManager.GET_META_DATA | PackageManager.GET_PERMISSIONS, user)) {
-                if (Objects.equals(MANAGER_APPLICATION_ID, pi.packageName)) continue;
-                if (pi.applicationInfo == null) continue;
-
-                int uid = pi.applicationInfo.uid;
-                int flags = 0;
-                ShizukuConfig.PackageEntry entry = configManager.find(uid);
-                if (entry != null) {
-                    if (entry.packages != null && !entry.packages.contains(pi.packageName))
-                        continue;
-                    flags = entry.flags & ConfigManager.MASK_PERMISSION;
-                }
-
-                if (flags != 0) {
-                    list.add(pi);
-                } else if (pi.applicationInfo.metaData != null
-                        && pi.applicationInfo.metaData.getBoolean("moe.shizuku.client.V3_SUPPORT", false)
-                        && pi.requestedPermissions != null
-                        && ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
+            for (String packageName : BassAllowList.packages()) {
+                PackageInfo pi = PackageManagerApis.getPackageInfoNoThrow(packageName, PackageManager.GET_META_DATA | PackageManager.GET_PERMISSIONS, user);
+                if (pi != null && pi.applicationInfo != null) {
                     list.add(pi);
                 }
             }
-
         }
         return new ParcelableListSlice<>(list);
     }
@@ -476,17 +306,10 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
     }
 
     private static void sendBinderToClient(Binder binder, int userId) {
-        try {
-            for (PackageInfo pi : PackageManagerApis.getInstalledPackagesNoThrow(PackageManager.GET_PERMISSIONS, userId)) {
-                if (pi == null || pi.requestedPermissions == null)
-                    continue;
-
-                if (ArraysKt.contains(pi.requestedPermissions, PERMISSION)) {
-                    sendBinderToUserApp(binder, pi.packageName, userId);
-                }
+        for (String packageName : BassAllowList.packages()) {
+            if (PackageManagerApis.getApplicationInfoNoThrow(packageName, 0, userId) != null) {
+                sendBinderToUserApp(binder, packageName, userId);
             }
-        } catch (Throwable tr) {
-            LOGGER.e("exception when call getInstalledPackages", tr);
         }
     }
 
@@ -517,7 +340,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
             LOGGER.e(tr, "Failed to add %d:%s to power save temp whitelist", userId, packageName);
         }
 
-        String name = packageName + ".shizuku";
+        String name = packageName + (MANAGER_APPLICATION_ID.equals(packageName) ? ".shizuku" : BassAllowList.CLIENT_PROVIDER_SUFFIX);
         IContentProvider provider = null;
 
         /*
