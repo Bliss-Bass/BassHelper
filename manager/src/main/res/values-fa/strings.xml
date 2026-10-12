@@ -10,7 +10,6 @@
     <string name="home_status_service_version_update"><![CDATA[نسخه %2$s، %1$s<br>برای به‌روزرسانی به نسخه %3$s برنامه را راه‌اندازی مجدد نمایید]]></string>
     <!-- Home - Adb -->
     <string name="home_adb_title"><![CDATA[با اتصال به رایانه شروع کنید]]></string>
-    <string name="home_adb_description"><![CDATA[برای دستگاه‌های بدون دسترسی ریسه، باید از adb برای راه‌اندازی Bass Helper استفاده کنید (نیاز به اتصال به رایانه دارد). این فرآیند باید هر بار که دستگاه راه اندازی مجدد می شود تکرار شود. لطفاً <b><a href=\"%1$s\">راهنما را بخوانید</a></b>.]]></string>
     <string name="home_adb_button_view_help">خواندن راهنما</string>
     <string name="home_adb_button_view_command">مشاهده دستور</string>
     <string name="home_adb_dialog_view_command_message"><![CDATA[<font face="monospace">%1$s</font><br><br>* ملاحظات دیگری نیز وجود دارد، لطفاً تأیید کنید که ابتدا راهنما را خوانده اید.]]></string>
@@ -18,7 +17,6 @@
     <string name="home_adb_dialog_view_command_button_send">ارسال</string>
     <!-- Home - Wireless Adb -->
     <string name="home_wireless_adb_title"><![CDATA[از طریق اشکال زدایی بی سیم شروع کنید]]></string>
-    <string name="home_wireless_adb_description"><![CDATA[در اندروید ۱۱ یا بالاتر، می‌توانید اشکال‌زدایی بی‌سیم را فعال کنید و Bass Helper را مستقیماً از دستگاه خود بدون اتصال به رایانه شروع کنید.<p>لطفاً ابتدا راهنمای گام به گام را مطالعه کنید.]]></string>
     <string name="home_wireless_adb_description_pre_11"><![CDATA[قبل از اندروید ۱۱، برای فعال کردن اشکال‌زدایی بی‌سیم، اتصال به رایانه لازم است.]]></string>
     <string name="home_wireless_adb_view_guide_button">راهنمای گام به گام</string>
     <!-- Adb -->
@@ -67,10 +65,8 @@
     <string name="home_app_management_empty">برنامه‌هایی که Bass Helper را درخواست کرده یا اعلام کرده‌اند در اینجا نشان داده می‌شوند.</string>
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">شما باید یک قدم اضافی بردارید</string>
-    <string name="home_adb_is_limited_description">سازنده دستگاه شما مجوزهای adb را محدود کرده است و برنامه هایی که از Bass Helper استفاده می کنند به درستی کار نمی کنند.\n\nمعمولاً با تنظیم برخی از گزینه‌ها در \"گزینه‌های توسعه دهنده\" می‌توان این محدودیت را برطرف کرد. لطفاً راهنما را برای جزئیات نحوه انجام این کار بخوانید.\n\nشاید لازم باشد Bass Helper را مجدداً راه اندازی کنید تا عملیات اجرایی شود.</string>
     <!-- Application management -->
     <string name="app_management_dialog_adb_is_limited_title">مجوز adb محدود است</string>
-    <string name="app_management_dialog_adb_is_limited_message"><![CDATA[این احتمال وجود دارد که سازنده دستگاه شما مجوز adb را محدود کند.<p>ممکن است راه حلی برای دستگاه شما در <b><a href=\"%1$s\">این سند</a></b> وجود داشته باشد.]]></string>
     <string name="app_management_item_summary_requires_root">* نیاز دارد که Bass Helper با امتیازات ریشه اجرا شود</string>
     <!-- Terminal -->
     <string name="home_terminal_title">از Bass Helper در برنامه های پایانه استفاده کنید</string>

@@ -42,6 +42,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@android:id/button3"
         style="@style/CardButton"
+        android:visibility="gone"
         android:text="@string/home_wireless_adb_view_guide_button"
         app:icon="@drawable/ic_outline_open_in_new_24" />
 

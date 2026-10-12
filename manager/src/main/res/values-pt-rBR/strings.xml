@@ -41,7 +41,6 @@
     <string name="settings_language">Idioma</string>
     <string name="settings_title">Configurações</string>
     <string name="app_management_item_summary_requires_root">* precisa do Bass Helper executado com privilégios de root</string>
-    <string name="app_management_dialog_adb_is_limited_message">É bem provável que o fabricante do seu dispositivo limite a permissão do ADB.&lt;p&gt;Pode haver uma solução para seu sistema &lt;b&gt;&lt;a href=\"%1$s\"&gt;neste documento&lt;/a&gt;&lt;/b&gt;.</string>
     <string name="app_management_dialog_adb_is_limited_title">A permissão do ADB é limitada</string>
     <string name="home_app_management_view_authorized_apps">Toque para gerenciar os aplicativos autorizados</string>
     <plurals name="home_app_management_authorized_apps_count">
@@ -82,7 +81,6 @@
     <string name="home_adb_dialog_view_command_copy_button">Copiar</string>
     <string name="home_adb_button_view_command">Ver o comando</string>
     <string name="home_adb_button_view_help">Ler a ajuda</string>
-    <string name="home_adb_description">Para aparelhos sem ROOT, será necessário usar o ADB para iniciar o Bass Helper (requer conexão ao computador). Este processo precisa ser repetido sempre que o aparelho for reiniciado. Por favor <b><a href="%1$s">leia a ajuda</a></b>.</string>
     <string name="home_adb_title">Comece conectando-se a um computador</string>
     <string name="terminal_tutorial_3">Finalmente, mova os arquivos para algum lugar onde seu aplicativo terminal possa acessar, você poderá usar %1$s para executar comandos através do Bass Helper.</string>
     <string name="terminal_tutorial_3_description">Algumas dicas: conceda permissão de execução a %1$s e adicione-a a %2$s, você poderá usar %1$s diretamente.</string>
@@ -107,7 +105,6 @@
     <string name="notification_adb_pairing_working_title">Processando pareamento</string>
     <string name="notification_adb_pairing_succeed_text">Agora, você pode iniciar o serviço do Bass Helper.</string>
     <string name="adb_pairing_tutorial_title">Parear Bass Helper com seu dispositivo</string>
-    <string name="home_wireless_adb_description">No Android 11 ou superior, você pode ativar a Depuração via Wireless e iniciar o Bass Helper diretamente do seu dispositivo, sem se conectar a um computador. &lt;p&gt; Primeiro, consulte esse guia passo a passo.</string>
     <string name="home_wireless_adb_description_pre_11">Antes do Android 11, é necessário conectar-se a um computador para habilitar a Depuração via Wireless.</string>
     <string name="home_wireless_adb_view_guide_button">Guia passo a passo</string>
     <string name="adb_pairing_tutorial_content_finish">Volte para Bass Helper e inicie o Bass Helper.</string>
@@ -125,9 +122,4 @@
     <string name="home_adb_is_limited_title">Você precisa de um passo adicional</string>
     <string name="home_app_management_empty">Apps que solicitaram ou declararam acesso ao Bass Helper aparecerão aqui.</string>
     <string name="dialog_adb_discovery_message_toggle_wireless_debugging">Por favor, tente desativar e reativar a \"Depuração por Wi-Fi\" se não parar de ficar procurando.</string>
-    <string name="home_adb_is_limited_description">O fabricante do seu dispositivo restringiu as permissões ADB e os apps que usam o Bass Helper não funcionarão corretamente.
-\n
-\nNormalmente, essa limitação pode ser eliminada ajustando algumas opções nas “Opções do desenvolvedor”. Por favor, leia a ajuda para obter detalhes sobre como fazer isso.
-\n
-\nPode ser necessário reiniciar o Bass Helper para que a operação tenha efeito.</string>
 </resources>

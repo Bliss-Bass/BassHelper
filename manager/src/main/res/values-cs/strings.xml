@@ -34,7 +34,6 @@
     <string name="settings_language">Jazyk</string>
     <string name="settings_title">Nastavení</string>
     <string name="app_management_item_summary_requires_root">* vyžaduje spustit Bass Helper s rootem</string>
-    <string name="app_management_dialog_adb_is_limited_message">Je vysoce možné, že výrobce vašeho zařízení omezuje oprávnění adb. &lt;p&gt; V &lt;b&gt; &lt;a href=\"%1$s\"&gt; tomto dokumentu &lt;/a&gt; &lt;/b&gt; může být pro váš systém řešení.</string>
     <string name="app_management_dialog_adb_is_limited_title">Oprávnění adb je omezené</string>
     <string name="home_app_management_view_authorized_apps">Klepnutím můžete spravovat autorizované aplikace</string>
     <plurals name="home_app_management_authorized_apps_count">
@@ -82,7 +81,6 @@
     <string name="home_adb_dialog_view_command_message">&lt;font face=monospace&gt;%1$s&lt;/font&gt;&lt;br&gt;&lt;br&gt;* Existuje několik dalších úvah, nejprve si prosím přečtěte nápovědu.</string>
     <string name="home_adb_button_view_command">Zobrazit příkaz</string>
     <string name="home_adb_button_view_help">Přečíst nápovědu</string>
-    <string name="home_adb_description">U zařízení bez root musíte ke spuštění Bass Helper použít adb (vyžaduje připojení k počítači). Tento proces je třeba opakovat při každém restartu zařízení. Přečtěte si prosím &lt;b&gt; &lt;a href=\"%1$s\"&gt; nápovědu &lt;/a&gt; &lt;/b&gt;.</string>
     <string name="grant_dialog_button_deny">Zakázat</string>
     <string name="grant_dialog_button_allow_always">Povolit vždy</string>
     <string name="permission_warning_template">Povolit aplikaci &lt;/b&gt;%1$s&lt;/b&gt; %2$s\?</string>
@@ -111,18 +109,12 @@
     <string name="notification_adb_pairing_succeed_text">Nyní můžete spustit službu Bass Helper.</string>
     <string name="notification_adb_pairing_failed_title">Párování selhalo</string>
     <string name="notification_adb_pairing_retry">Zkusit znovu</string>
-    <string name="home_wireless_adb_description">Na verzi Android 11 nebo vyšší můžete povolit Bezdrátové ladění a spustit Bass Helper přímo z vašeho zařízení, bez připojení k počítači. Přečtěte si prosím prvně návod krok-za-krokem před spuštěním.</string>
     <string name="adb_pairing_tutorial_content_notification">Notifikace od Bass Helper vám pomůže dokončit párování.</string>
     <string name="adb_pairing_tutorial_content_notification_blocked">Proces párování vyžaduje interakci s oznámením od Bass Helper. Prosím povolte Bass Helper posílat oznámení.</string>
     <string name="adb_pairing_tutorial_content_finish">Běžte zpátky do Bass Helper a spusťte Bass Helper.</string>
     <string name="adb_pairing_tutorial_content_network">Bass Helper potřebuje přístup k lokální síti, který je spravován oprávněním k síti.</string>
     <string name="adb_pairing_tutorial_content_network_limation_not_foreground">Některé systémy (například MIUI) nepovolují aplikacím přístup k síti když nejsou viditelné, i když používají služby na popředí. Prosím zakažte optimalizace baterie na takových systémech.</string>
     <string name="home_adb_is_limited_title">Je třeba udělat jeden krok navíc</string>
-    <string name="home_adb_is_limited_description">Výrobce vašeho zařízení omezil přístup k adb a aplikace používající Bass Helper by kvůli tomu nefungovaly správně.
-\n
-\nToto omezení může většinou být zakázáno pouze změněním některých možností ve \"Vývojářských Nastaveních\". Prosím přečtěte si stránku podpory pro informace jak toto udělat.
-\n
-\nMožná budete muset restartovat Bass Helper pro tuto operaci aby měla efekt.</string>
     <string name="adb_pairing_tutorial_content_miui">Uživatelé MIUI možná budou muset přepnout styl oznámení na \"Android\" z \"Oznámení\" - \"Lišta Oznámení\" v nastavení systému.</string>
     <string name="terminal_tutorial_1_description">Pokir jsou be vybrané složce soubory se stejným jménem budou smazány.
 \n

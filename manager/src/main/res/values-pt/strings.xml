@@ -59,7 +59,6 @@
     <string name="home_terminal_description">Execute comandos através do Bass Helper em aplicativos de terminal que você queira</string>
     <string name="home_terminal_title">Use Bass Helper em aplicativos de terminal</string>
     <string name="app_management_item_summary_requires_root">* requer que o Bass Helper seja executado com root</string>
-    <string name="app_management_dialog_adb_is_limited_message">É altamente possível que o fabricante do seu dispositivo limite a permissão do adb.&lt;p&gt;Pode haver uma solução para o seu sistema &lt;b&gt;&lt;a href=\"%1$s\"&gt;neste documento&lt;/a&gt;&lt;/b&gt;.</string>
     <string name="app_management_dialog_adb_is_limited_title">A permissão do adb é limitada</string>
     <string name="home_app_management_view_authorized_apps">Toque para gerenciar aplicativos autorizados</string>
     <plurals name="home_app_management_authorized_apps_count">
@@ -109,25 +108,18 @@
     <string name="dialog_adb_discovery">Procurando serviço de depuração sem fio</string>
     <string name="home_wireless_adb_view_guide_button">Guia passo a passo</string>
     <string name="home_wireless_adb_description_pre_11">Antes do Android 11, é necessário conectar-se a um computador para ativar a depuração sem fio.</string>
-    <string name="home_wireless_adb_description">No Android 11 ou superior, você pode ativar a depuração sem fio e iniciar o Bass Helper diretamente do seu dispositivo, sem conectar a um computador.&lt;p&gt;Veja o guia passo a passo primeiro.</string>
     <string name="home_wireless_adb_title">Iniciar via depuração sem fio</string>
     <string name="home_adb_dialog_view_command_button_send">Mandar</string>
     <string name="home_adb_dialog_view_command_copy_button">Copiar</string>
     <string name="home_adb_dialog_view_command_message">&lt;font face=monospace&gt;%1$s&lt;/font&gt;&lt;br&gt;&lt;br&gt;* Existem algumas outras considerações, por favor confirme que você leu a ajuda primeiro.</string>
     <string name="home_adb_button_view_command">Ver o comando</string>
     <string name="home_adb_button_view_help">Leia a ajuda</string>
-    <string name="home_adb_description">Para dispositivos sem root, você precisa usar o adb para iniciar o Bass Helper (requer conexão com o computador). Esse processo precisa ser repetido toda vez que o dispositivo for reiniciado. Por favor, <b><a href="%1$s">leia o Ajuda</a></b>.</string>
     <string name="home_adb_title">Comece conectando-se a um computador</string>
     <string name="home_status_service_version_update">Versão %2$s, %1$s&lt;br&gt;Comece novamente para atualizar para a versão %3$s</string>
     <string name="home_status_service_version">Versão %2$s, %1$s</string>
     <string name="home_status_service_not_running">%1$s não está em execução</string>
     <string name="home_status_service_is_running">%1$s está em execução</string>
     <string name="translation_contributors">Arcent</string>
-    <string name="home_adb_is_limited_description">O fabricante do dispositivo restringiu as permissões adb e os aplicativos que usam Bass Helper não funcionarão corretamente.
-\n
-\nNormalmente, essa limitação pode ser contornada habilitando algumas opções em \"Opções do desenvolvedor\". Leia a ajuda para obter detalhes sobre como fazer isso.
-\n
-\nPode ser necessário reiniciar o Bass Helper para que a operação entre em vigor.</string>
     <string name="home_adb_is_limited_title">Você precisa dar um passo extra</string>
     <string name="home_app_management_empty">Os aplicativos que solicitaram ou declararem Bass Helper serão exibidos aqui.</string>
     <string name="dialog_adb_discovery_message_toggle_wireless_debugging">Por favor, tente desabilitar e habilitar \"Depuração sem fio\" se continuar procurando.</string>

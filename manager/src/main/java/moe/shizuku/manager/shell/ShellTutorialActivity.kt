@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.app.AppBarActivity
 import moe.shizuku.manager.databinding.TerminalTutorialActivityBinding
 import moe.shizuku.manager.ktx.toHtml
-import moe.shizuku.manager.utils.CustomTabsHelper
 import rikka.html.text.HtmlCompat
 import rikka.insets.*
 import kotlin.math.roundToInt
@@ -102,8 +100,6 @@ class ShellTutorialActivity : AppBarActivity() {
                 shName, "<font face=\"monospace\">PATH</font>"
             ).toHtml()
 
-            button1.setOnClickListener { openDocumentsTree.launch(null) }
-            button2.setOnClickListener { v: View -> CustomTabsHelper.launchUrlOrCopy(v.context, Helps.RISH.get()) }
-        }
+            button1.setOnClickListener { openDocumentsTree.launch(null) }        }
     }
 }

@@ -58,7 +58,6 @@
     <string name="home_adb_dialog_view_command_message">&lt;font face=monospace&gt;%1$s&lt;/font&gt;&lt;br&gt;&lt;br&gt;* 他にもいくつか注意点がありますので、まずはヘルプを読んで確認してください。</string>
     <string name="home_adb_button_view_help">ヘルプ</string>
     <string name="home_adb_button_view_command">コマンドを表示する</string>
-    <string name="home_adb_description">root権限を持たないデバイスの場合、adbを使ってBass Helperを起動する必要があります（コンピュータへの接続が必要）。この作業は、端末を再起動するたびに繰り返す必要があります。<b><a href="%1$s">詳しくはヘルプをお読みください</a></b>。</string>
     <string name="dialog_adb_discovery_message">「開発者向けオプション」で「ワイヤレスデバッグ」を有効にしてください。ネットワークが変更されると、「ワイヤレスデバッグ」は自動的に無効になります。
 \n
 \n注意:「開発者向けオプション」や「USBデバッグ」を無効にしないでください。無効にすると、Bass Helperが停止してしまいます。</string>
@@ -68,7 +67,6 @@
     <string name="home_status_service_version_update">バージョン %2$s, %1$s&lt;br&gt;バージョン %3$s にアップデートするには、再度起動してください</string>
     <string name="translation_contributors">IMES-mitutti</string>
     <string name="app_management_dialog_adb_is_limited_title">adbの権限が制限されています</string>
-    <string name="app_management_dialog_adb_is_limited_message">端末の製造元がadbの権限を制限している可能性が高いです。&lt;p&gt; &lt;b&gt;&lt;a href=\"%1$s\"&gt;このドキュメント&lt;/a&gt;&lt;/b&gt;の中に、あなたのシステムに合った解決策があるかもしれません。</string>
     <string name="app_management_item_summary_requires_root">* root権限でBass Helperを実行する必要があります</string>
     <string name="action_stop">Bass Helperを停止する</string>
     <string name="settings_title">設定</string>
@@ -95,7 +93,6 @@
     <string name="starter">起動</string>
     <string name="dialog_cannot_open_browser_title">ブラウザが起動することができません</string>
     <string name="rish_description">%1$sを使えば、任意のターミナルアプリで、Bass Helperが実行するシェルに接続し、対話することができます。&lt;p&gt;詳しい使い方については、%1$sをタップするとドキュメントが表示されます。</string>
-    <string name="home_wireless_adb_description">Android 11以上ではワイヤレスデバッグを有効にして、コンピュータに接続することなくデバイスから直接Bass Helperを起動できます。&lt;p&gt;詳しくはガイドをご覧ください。</string>
     <string name="notification_settings">通知オプション</string>
     <string name="home_wireless_adb_description_pre_11">Android 11以前では、ワイヤレスデバッグを有効にするためにパソコンとの接続が必要です。</string>
     <string name="home_wireless_adb_view_guide_button">ガイド</string>
@@ -123,10 +120,5 @@
     <string name="adb_pairing_tutorial_content_network">Bass Helperはローカルネットワークにアクセスする必要があります。ネットワーク権限で管理されています。</string>
     <string name="adb_pairing_tutorial_content_left_is_clickable">なお、「ワイヤレスデバッグ」オプションの左側はクリック可能で、タップすると新しいページが表示されます。右側のスイッチだけをオンにするのは誤りです。</string>
     <string name="adb_pairing_tutorial_content_miui_2">場合によっては、通知からペアリングコードを入力できないことがあります。</string>
-    <string name="home_adb_is_limited_description">お使いの端末製造元は adb 権限を制限しており､ Bass Helper を使用するアプリは正しく動作しません。
-\n
-\n通常､ この制限は「開発者向けオプション」のいくつかの項目を調整することで解除できます。これを行う方法の詳細については､ ヘルプをお読みください。
-\n
-\n操作を有効にするために､ Bass Helperを再起動する必要がある場合があります。</string>
     <string name="dialog_adb_discovery_message_toggle_wireless_debugging">検索され続ける場合は、「ワイヤレスデバッグ」の無効化と有効化をしてみてください。</string>
 </resources>

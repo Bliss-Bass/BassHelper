@@ -8,11 +8,9 @@ import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.app.AppActivity
 import moe.shizuku.manager.databinding.ConfirmationDialogBinding
-import moe.shizuku.manager.ktx.toHtml
 import moe.shizuku.manager.utils.Logger.LOGGER
 import rikka.core.res.resolveColor
 import rikka.html.text.HtmlCompat
@@ -49,7 +47,7 @@ class RequestPermissionActivity : AppActivity() {
         val dialog = MaterialAlertDialogBuilder(this)
                 .setIcon(icon)
                 .setTitle("${getString(R.string.app_name)}: ${getString(R.string.app_management_dialog_adb_is_limited_title)}")
-                .setMessage(getString(R.string.app_management_dialog_adb_is_limited_message, Helps.ADB.get()).toHtml(HtmlCompat.FROM_HTML_OPTION_TRIM_WHITESPACE))
+                .setMessage(R.string.app_management_dialog_adb_is_limited_message)
                 .setPositiveButton(android.R.string.ok, null)
                 .setOnDismissListener { finish() }
                 .create()

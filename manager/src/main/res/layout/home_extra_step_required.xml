@@ -54,6 +54,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@android:id/button1"
         style="@style/CardButton"
+        android:visibility="gone"
         android:text="@string/home_adb_button_view_help"
         android:textColor="?colorOnError"
         app:backgroundTint="?colorError"

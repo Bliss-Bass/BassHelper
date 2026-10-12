@@ -61,7 +61,6 @@
     <string name="home_terminal_description">İstədiyiniz terminal proqramlarında Bass Helper vasitəsilə əmrləri işə salın</string>
     <string name="home_terminal_title">Shizikunu terminal proqramlarında istifadə edin</string>
     <string name="app_management_item_summary_requires_root">* Bass Helper rootla işləməsini tələb edir</string>
-    <string name="app_management_dialog_adb_is_limited_message">Çox güman ki, cihazınızın istehsalçısı adb icazəsini məhdudlaşdırır.&lt;p&gt;Sisteminiz üçün &lt;b&gt;&lt;a href=\"%1$s\"&gt;bu sənəddə&lt;/a&gt;&lt;/b&gt; həll yolu ola bilər.</string>
     <string name="app_management_dialog_adb_is_limited_title">adb icazəsi məhduddur</string>
     <string name="home_app_management_view_authorized_apps">İcazə verilmiş proqramları idarə etmək üçün toxunun</string>
     <plurals name="home_app_management_authorized_apps_count">
@@ -110,13 +109,11 @@
     <string name="dialog_adb_discovery">Simsiz debaq cihazı axtarılır</string>
     <string name="home_wireless_adb_view_guide_button">Addım-Addım Təlimat</string>
     <string name="home_wireless_adb_description_pre_11">Android 11 - dən aşağı android versiyalarında simsiz debaq üçün kompüterə bağlanmaq mütləqdir</string>
-    <string name="home_wireless_adb_description">Android 11 və ya daha yuxarı versiyalarda siz Simsiz debaqı aktivləşdirə və kompüterə qoşulmadan Bass Helper-nu birbaşa cihazınızdan başlada bilərsiniz.&lt;p&gt;Lütfən, əvvəlcə addım-addım təlimata baxın.</string>
     <string name="home_wireless_adb_title">Simsiz debaq ilə başladın</string>
     <string name="home_adb_dialog_view_command_button_send">Göndər</string>
     <string name="home_adb_dialog_view_command_message">&lt;font face=monospace&gt;%1$s&lt;/font&gt;&lt;br&gt;&lt;br&gt;* Bəzi başqa mülahizələr də var, lütfən, əvvəlcə yardımı oxuduğunuzu təsdiqləyin.</string>
     <string name="home_adb_button_view_command">Əmirə baxın</string>
     <string name="home_adb_button_view_help">Yardım</string>
-    <string name="home_adb_description">Root olmayan cihazlarda Bass Helper-nu işə salmaq üçün adb-dən istifadə etməlisiniz (kompüter bağlantısı tələb olunur). Cihaz hər dəfə yenidən işə salındıqda bu proses təkrarlanmalıdır. Lütfən, <b><a href="%1$s">yardımı oxuyun</a></b>.</string>
     <string name="home_adb_title">Kompüterə qoşularaq başlayın</string>
     <string name="home_status_service_version_update">Versiya %2$s, %1$s &lt;br&gt; %3$s Versiyasına güncəlləmək üçün proqramı yenidən başladın</string>
     <string name="home_status_service_version">Versiya %2$s, %1$s</string>

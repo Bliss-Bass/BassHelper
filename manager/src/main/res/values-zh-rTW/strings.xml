@@ -10,7 +10,6 @@
     <string name="home_root_button_restart">重新啟動</string>
     <string name="home_root_title">啟動 (針對已 Root 裝置)</string>
     <string name="home_adb_title">透過與電腦連線來啟動 (使用 ADB)</string>
-    <string name="home_adb_description">沒有 Root 的裝置需藉助 ADB 來啟動 Bass Helper (須與電腦連線)。在裝置每次重新啟動後，這項作業皆須重新進行。請<b><a href="%1$s">閱讀說明</a></b>。</string>
     <string name="home_root_description">另外，Bass Helper 可以在開機時自動啟動。如果沒有啟動，請檢查 Bass Helper 是否被您的系統或是第三方工具限制。&lt;br&gt;你可以參考 %s。</string>
     <string name="home_adb_dialog_view_command_copy_button">複製</string>
     <string name="home_adb_dialog_view_command_button_send">傳送</string>
@@ -42,7 +41,6 @@
     <string name="settings_black_night_theme_summary">夜間模式啟用時使用純黑色主題</string>
     <string name="settings_startup">啟動</string>
     <string name="app_management_dialog_adb_is_limited_title">ADB 權限受限</string>
-    <string name="app_management_dialog_adb_is_limited_message">這極有可能是你的裝置製造商限制了 ADB 的權限。&lt;p&gt;&lt;b&gt;&lt;a href=\"%1$s\"&gt;此文件&lt;/a&gt;&lt;/b&gt;中可能有針對你的系統的解決方案。</string>
     <string name="home_adb_button_view_help">閱讀說明</string>
     <string name="dialog_cannot_open_browser_title">無法啟動瀏覽器</string>
     <string name="toast_copied_to_clipboard_with_text"><b>%s</b> 已複製到剪貼簿。</string>
@@ -56,7 +54,6 @@
     <string name="dialog_adb_invalid_port">通訊埠是一個 1 至 65535 的整數。</string>
     <string name="dialog_adb_pairing_paring_code">配對碼</string>
     <string name="home_wireless_adb_title">透過無線偵錯啟動</string>
-    <string name="home_wireless_adb_description">在 Android 11 或更高版本上，您可以直接從您的裝置啟用無線偵錯並啟動 Bass Helper，無須與電腦連線。&lt;p&gt;請先檢視分步驟指南。</string>
     <string name="dialog_adb_pairing_title">與裝置配對</string>
     <string name="paring_code_is_wrong">配對碼錯誤。</string>
     <string name="cannot_connect_port">無法連線至無線偵錯服務。</string>
@@ -124,9 +121,4 @@
     <string name="adb_pairing_tutorial_content_finish">回到 Bass Helper 並啟動 Bass Helper。</string>
     <string name="home_app_management_empty">已要求或宣告 Bass Helper 的應用程式將顯示在此處。</string>
     <string name="home_adb_is_limited_title">您需要進行額外的步驟</string>
-    <string name="home_adb_is_limited_description">您的裝置製造商限制了 ADB 的權限，使用 Bass Helper 的應用程式無法正常運作。
-\n
-\n通常，在「開發人員選項」中調整一些選項即可解除此限制。請閱讀說明來瞭解具體的作業方式。
-\n
-\n您可能需要重新啟動 Bass Helper 以使作業生效。</string>
 </resources>

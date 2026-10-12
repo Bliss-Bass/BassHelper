@@ -11,14 +11,12 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
-import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.adb.AdbPairingTutorialActivity
 import moe.shizuku.manager.databinding.HomeItemContainerBinding
 import moe.shizuku.manager.databinding.HomeStartWirelessAdbBinding
 import moe.shizuku.manager.ktx.toHtml
 import moe.shizuku.manager.starter.StarterActivity
-import moe.shizuku.manager.utils.CustomTabsHelper
 import moe.shizuku.manager.utils.EnvironmentUtils
 import rikka.core.content.asActivity
 import rikka.html.text.HtmlCompat
@@ -43,9 +41,6 @@ class StartWirelessAdbViewHolder(binding: HomeStartWirelessAdbBinding, root: Vie
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            binding.button3.setOnClickListener { v: View ->
-                CustomTabsHelper.launchUrlOrCopy(v.context, Helps.ADB_ANDROID11.get())
-            }
             binding.button2.setOnClickListener { v: View ->
                 onPairClicked(v.context)
             }
@@ -56,7 +51,6 @@ class StartWirelessAdbViewHolder(binding: HomeStartWirelessAdbBinding, root: Vie
             binding.text1.text = context.getString(R.string.home_wireless_adb_description_pre_11)
                 .toHtml(HtmlCompat.FROM_HTML_OPTION_TRIM_WHITESPACE)
             binding.button2.isVisible = false
-            binding.button3.isVisible = false
         }
     }
 

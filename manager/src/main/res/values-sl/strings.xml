@@ -31,7 +31,6 @@
     <string name="dialog_adb_pairing_title">Seznani z napravo</string>
     <string name="adb_pairing">Seznanjanje</string>
     <string name="dialog_adb_invalid_port">Vrata so število v obsegu od 1 do 65535.</string>
-    <string name="home_adb_description">Za naprave brez root-a, potrebujete adb, da zaženete Bass Helper (potrebna je računalniška povezava). Ta proces je potrebno ponoviti vsakič, ko se naprava ponovno zažene. Prosimo <b><a href="%1$s">preberite pomoč</a></b>.</string>
     <string name="dialog_adb_port">Vrata</string>
     <string name="dialog_adb_discovery_message">Prosimo omogočite \"Brezžično razhroščevanje\" v \"Nastavitvah za razvijalce\". \"Brezžično razhroščevanje\" je avtomatsko onemogočeno, ko se spremeni omrežje.
 \n
@@ -39,7 +38,6 @@
     <string name="dialog_adb_discovery">Iskanje storitve za Brezžično razhroščevanje</string>
     <string name="home_wireless_adb_view_guide_button">Vodnik po korakih</string>
     <string name="home_wireless_adb_description_pre_11">Pred Androidom 11, je povezava z računalnikom potrebna, da omogočite Brezžično razhroščevanje.</string>
-    <string name="home_wireless_adb_description">Na Androidu 11 ali več, lahko vklopite Brezžično razhroščevanje in začnete Bass Helper direktno iz vaše naprave, brez povezovanja na računalnik.&lt;p&gt;Prosimo, najprej poglejte vodnik po korakih.</string>
     <string name="home_wireless_adb_title">Začni preko Brezžičnega razhroščevanja</string>
     <string name="home_adb_dialog_view_command_button_send">Pošlji</string>
     <string name="home_adb_dialog_view_command_copy_button">Kopiraj</string>

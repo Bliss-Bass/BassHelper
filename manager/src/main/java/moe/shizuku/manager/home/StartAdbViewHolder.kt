@@ -1,17 +1,14 @@
 package moe.shizuku.manager.home
 
 import android.content.Intent
-import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import moe.shizuku.manager.Helps
 import moe.shizuku.manager.R
 import moe.shizuku.manager.databinding.HomeItemContainerBinding
 import moe.shizuku.manager.databinding.HomeStartAdbBinding
-import moe.shizuku.manager.ktx.toHtml
 import moe.shizuku.manager.starter.Starter
 import rikka.core.util.ClipboardUtils
 import rikka.html.text.HtmlCompat
@@ -63,8 +60,6 @@ class StartAdbViewHolder(binding: HomeStartAdbBinding, root: View) : BaseViewHol
                 }
                 .show()
         }
-        binding.text1.movementMethod = LinkMovementMethod.getInstance()
-        binding.text1.text = context.getString(R.string.home_adb_description, Helps.ADB.get())
-            .toHtml(HtmlCompat.FROM_HTML_OPTION_TRIM_WHITESPACE)
+        binding.text1.setText(R.string.home_adb_description)
     }
 }

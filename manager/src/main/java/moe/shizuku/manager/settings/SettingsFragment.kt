@@ -22,7 +22,6 @@ import moe.shizuku.manager.ktx.isComponentEnabled
 import moe.shizuku.manager.ktx.setComponentEnabled
 import moe.shizuku.manager.ktx.toHtml
 import moe.shizuku.manager.receiver.BootCompleteReceiver
-import moe.shizuku.manager.utils.CustomTabsHelper
 import rikka.core.util.ResourceUtils
 import rikka.material.app.LocaleDelegate
 import rikka.recyclerview.addEdgeSpacing
@@ -125,12 +124,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             useSystemColorPreference.isVisible = false
         }
 
-        translationPreference.summary =
-            context.getString(R.string.settings_translation_summary, context.getString(R.string.app_name))
-        translationPreference.setOnPreferenceClickListener {
-            CustomTabsHelper.launchUrlOrCopy(context, context.getString(R.string.translation_url))
-            true
-        }
+        translationPreference.isVisible = false
 
         val contributors = context.getString(R.string.translation_contributors).toHtml().toString()
         if (contributors.isNotBlank()) {

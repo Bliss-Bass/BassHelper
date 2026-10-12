@@ -12,7 +12,7 @@
 
     <!-- Home - Adb -->
     <string name="home_adb_title"><![CDATA[Start by connecting to a computer]]></string>
-    <string name="home_adb_description"><![CDATA[For devices without root, you need to use adb to start Bass Helper (requires computer connection). This process needs to be repeated every time the device is restarted. Please <b><a href=\"%1$s\">read the help</a></b>.]]></string>
+    <string name="home_adb_description">For devices without root, you need to use adb to start Bass Helper (requires computer connection). This process needs to be repeated every time the device is restarted.</string>
     <string name="home_adb_button_view_help">Read help</string>
     <string name="home_adb_button_view_command">View command</string>
     <string name="home_adb_dialog_view_command_message"><![CDATA[<font face="monospace">%1$s</font><br><br>* There are some other considerations, please confirm that you have read the help first.]]></string>
@@ -21,7 +21,7 @@
 
     <!-- Home - Wireless Adb -->
     <string name="home_wireless_adb_title"><![CDATA[Start via Wireless debugging]]></string>
-    <string name="home_wireless_adb_description"><![CDATA[On Android 11 or above, you can enable Wireless debugging and start Bass Helper directly from your device, without connecting to a computer.<p>Please view the step-by-step guide first.]]></string>
+    <string name="home_wireless_adb_description">On Android 11 or above, you can enable Wireless debugging and start Bass Helper directly from your device, without connecting to a computer.</string>
     <string name="home_wireless_adb_description_pre_11"><![CDATA[Before Android 11, connecting to a computer is required to enable Wireless debugging.]]></string>
     <string name="home_wireless_adb_view_guide_button">Step-by-step guide</string>
 
@@ -75,11 +75,11 @@
 
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">You need to take an extra step</string>
-    <string name="home_adb_is_limited_description">Your device manufacturer has restricted adb permissions and apps using Bass Helper will not work properly.\n\nUsually, this limitation can be lifted by adjusting some options in \"Developer options\". Please read the help for details on how to do this.\n\nYou may need to restart Bass Helper for the operation to take effect.</string>
+    <string name="home_adb_is_limited_description">Your device manufacturer has restricted adb permissions and apps using Bass Helper will not work properly.\n\nUsually, this limitation can be lifted by adjusting some options in \"Developer options\".\n\nYou may need to restart Bass Helper for the operation to take effect.</string>
 
     <!-- Application management -->
     <string name="app_management_dialog_adb_is_limited_title">The permission of adb is limited</string>
-    <string name="app_management_dialog_adb_is_limited_message"><![CDATA[It\'s highly possible that your device manufacturer limits the permission of adb.<p>There may be a solution for your system in <b><a href=\"%1$s\">this document</a></b>.]]></string>
+    <string name="app_management_dialog_adb_is_limited_message">It\'s highly possible that your device manufacturer limits the permission of adb.</string>
     <string name="app_management_item_summary_requires_root">* requires Bass Helper runs with root</string>
 
     <!-- Terminal -->
