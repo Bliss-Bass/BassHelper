@@ -178,7 +178,7 @@ private class ViewModel(context: Context) : androidx.lifecycle.ViewModel() {
             val host = "127.0.0.1"
 
             val key = try {
-                AdbKey(PreferenceAdbKeyStore(ShizukuSettings.getPreferences()), "shizuku")
+                AdbKey(PreferenceAdbKeyStore(ShizukuSettings.getPreferences()), "basshelper")
             } catch (e: Throwable) {
                 e.printStackTrace()
                 _result.postValue(AdbKeyException(e))

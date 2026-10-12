@@ -97,8 +97,8 @@ abstract class HomeActivity : AppBarActivity() {
                 val binding = AboutDialogBinding.inflate(LayoutInflater.from(this), null, false)
                 binding.sourceCode.movementMethod = LinkMovementMethod.getInstance()
                 binding.sourceCode.text = getString(
-                    R.string.about_view_source_code,
-                    "<b><a href=\"https://github.com/RikkaApps/Shizuku\">GitHub</a></b>"
+                    R.string.about_based_on,
+                    "<b><a href=\"https://github.com/RikkaApps/Shizuku\">Shizuku</a></b>"
                 ).toHtml()
                 binding.icon.setImageBitmap(
                     AppIconCache.getOrLoadBitmap(

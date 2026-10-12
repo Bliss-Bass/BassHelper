@@ -169,7 +169,7 @@ private class ViewModel(context: Context, root: Boolean, host: String?, port: In
 
         GlobalScope.launch(Dispatchers.IO) {
             val key = try {
-                AdbKey(PreferenceAdbKeyStore(ShizukuSettings.getPreferences()), "shizuku")
+                AdbKey(PreferenceAdbKeyStore(ShizukuSettings.getPreferences()), "basshelper")
             } catch (e: Throwable) {
                 e.printStackTrace()
                 sb.append('\n').append(Log.getStackTraceString(e))
