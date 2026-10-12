@@ -1,5 +1,8 @@
 def ksFile = rootProject.file('signing.properties')
 def props = new Properties()
+// SmartDock's release signing file (storeFile, storePassword, keyPassword); Bass Helper signs with its own alias.
+def bassFile = file(System.getenv('SMARTDOCK_SIGNING_PROPERTIES')
+        ?: "${System.getProperty('user.home')}/.config/smartdock/signing/release.properties")
 if (ksFile.canRead()) {
     props.load(new FileInputStream(ksFile))
 
@@ -9,7 +12,14 @@ if (ksFile.canRead()) {
         android.signingConfigs.sign.keyAlias props['KEYSTORE_ALIAS']
         android.signingConfigs.sign.keyPassword props['KEYSTORE_ALIAS_PASSWORD']
     }
+} else if (bassFile.canRead()) {
+    bassFile.withInputStream { props.load(it) }
+    android.signingConfigs.sign.storeFile file(props['storeFile'])
+    android.signingConfigs.sign.storePassword props['storePassword']
+    android.signingConfigs.sign.keyAlias 'basshelper'
+    android.signingConfigs.sign.keyPassword props['keyPassword']
 } else {
+    logger.warn("Bass Helper: no signing properties found, signing with the debug key")
     android.signingConfigs.sign.storeFile = android.signingConfigs.debug.storeFile
     android.signingConfigs.sign.storePassword = android.signingConfigs.debug.storePassword
     android.signingConfigs.sign.keyAlias = android.signingConfigs.debug.keyAlias
