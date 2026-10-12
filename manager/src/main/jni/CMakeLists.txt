@@ -28,14 +28,14 @@ find_library(log-lib log)
 find_package(boringssl REQUIRED CONFIG)
 find_package(cxx REQUIRED CONFIG)
 
-add_executable(libshizuku.so
+add_executable(libbasshelper.so
         starter.cpp misc.cpp selinux.cpp cgroup.cpp)
 
-target_link_libraries(libshizuku.so ${log-lib} cxx::cxx)
+target_link_libraries(libbasshelper.so ${log-lib} cxx::cxx)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_custom_command(TARGET libshizuku.so POST_BUILD
-            COMMAND ${CMAKE_STRIP} --remove-section=.comment "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libshizuku.so")
+    add_custom_command(TARGET libbasshelper.so POST_BUILD
+            COMMAND ${CMAKE_STRIP} --remove-section=.comment "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libbasshelper.so")
 endif ()
 
 add_library(adb SHARED

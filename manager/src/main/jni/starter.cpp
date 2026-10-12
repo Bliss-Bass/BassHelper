@@ -31,8 +31,8 @@
 #define EXIT_FATAL_KILL 9
 #define EXIT_FATAL_BINDER_BLOCKED_BY_SELINUX 10
 
-#define PACKAGE_NAME "moe.shizuku.privileged.api"
-#define SERVER_NAME "shizuku_server"
+#define PACKAGE_NAME "com.blisscolabs.basshelper"
+#define SERVER_NAME "bass_helper_server"
 #define SERVER_CLASS_PATH "rikka.shizuku.server.ShizukuService"
 
 #if defined(__arm__)
@@ -134,7 +134,7 @@ static void start_server(const char *path, const char *main_class, const char *p
             run_server(path, main_class, process_name);
         }
         default: {
-            printf("info: shizuku_server pid is %d\n", pid);
+            printf("info: %s pid is %d\n", SERVER_NAME, pid);
             printf("info: shizuku_starter exit with 0\n");
             exit(EXIT_SUCCESS);
         }

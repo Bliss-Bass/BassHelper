@@ -5,7 +5,7 @@ import java.io.File
 
 object Starter {
 
-    private val starterFile = File(application.applicationInfo.nativeLibraryDir, "libshizuku.so")
+    private val starterFile = File(application.applicationInfo.nativeLibraryDir, "libbasshelper.so")
 
     val userCommand: String = starterFile.absolutePath
 
