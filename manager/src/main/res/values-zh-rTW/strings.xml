@@ -47,8 +47,6 @@
     <string name="home_adb_button_view_help">閱讀說明</string>
     <string name="dialog_cannot_open_browser_title">無法啟動瀏覽器</string>
     <string name="toast_copied_to_clipboard_with_text"><b>%s</b> 已複製到剪貼簿。</string>
-    <string name="home_learn_more_title">瞭解 Shizuku</string>
-    <string name="home_learn_more_description">瞭解如何使用 Shizuku 開發</string>
     <string name="app_management_item_summary_requires_root">* 需要以 Root 執行的 Shizuku</string>
     <string name="settings_translation_contributors">翻譯貢獻者</string>
     <string name="translation_contributors"/>

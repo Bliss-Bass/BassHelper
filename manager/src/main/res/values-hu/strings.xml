@@ -65,9 +65,6 @@
     </plurals>
     <string name="home_app_management_view_authorized_apps"><![CDATA[Érintse meg az engedélyezett alkalmazások kezeléséhez]]></string>
     <string name="home_app_management_empty">Itt jelennek meg azok az alkalmazások, amelyek Shizukut kértek vagy bejelentettek.</string>
-    <!-- Home - Learn more -->
-    <string name="home_learn_more_title">Tanulja a Shizukut</string>
-    <string name="home_learn_more_description">Tanuljon meg fejlődni a Shizukuval</string>
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">Egy plusz lépést kell tennie</string>
     <string name="home_adb_is_limited_description">Az eszköz gyártója korlátozta az adb-engedélyeket, és a Shizuku-t használó alkalmazások nem működnek megfelelően.\n\nÁltalában ez a korlátozás bizonyos beállítások módosításával feloldható a \"Fejlesztői lehetőségek\"-nél. Kérjük, olvassa el a súgót ennek részleteiért.\n\nLehet, hogy újra kell indítania a Shizukut, hogy a művelet érvénybe lépjen.</string>

@@ -20,8 +20,6 @@
 \n
 \nMaaaring kailanganin mong isara at buksan ulit ang Shizuku para umepekto ang opersayon.</string>
     <string name="home_adb_is_limited_title">May mga karagdagang hakbang kang dapat gawin</string>
-    <string name="home_learn_more_description">Matuto kung paano mag-develop gamit ang Shizuku</string>
-    <string name="home_learn_more_title">Matuto Pa Tungkol sa Shizuku</string>
     <string name="home_app_management_empty">Lalabas dito ang mga app na hiniling o idineklara ang Shizuku.</string>
     <string name="home_app_management_view_authorized_apps">Pindutin para pamahalaan ang mga awtorisadong app</string>
     <plurals name="home_app_management_authorized_apps_count">

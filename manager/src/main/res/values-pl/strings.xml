@@ -47,7 +47,6 @@
     <string name="settings_startup">Rozruch</string>
     <string name="app_management_item_summary_requires_root">* wymaga by Shizuku działało z rootem</string>
     <string name="app_management_dialog_adb_is_limited_title">Uprawnienia adb są ograniczone</string>
-    <string name="home_learn_more_title">Dowiedz się więcej o Shizuku</string>
     <string name="dialog_adb_discovery_message">Proszę włączyć \"Debugowanie bezprzewodowe\" w \"Ustawieniach developerskich\". Debugowanie bezprzewodowe jest automatycznie wyłączane gdy przełączasz się między sieciami.
 \n
 \nNIE wyłączaj \"Ustawień developerskich\" lub \" Debugowania USB\" ponieważ jest wymagane do prawidłowego działania Shizuku.</string>
@@ -67,7 +66,6 @@
     <string name="home_root_description_sui">Jeśli używasz Magisk, możesz spróbować %1$s. Dla użytkowników roota, zamieni to Shizuku. Uwaga, istniejące aplikację muszą się dostosować by używać %2$s.</string>
     <string name="home_terminal_title">Używaj Shizuku w aplikacjach terminala</string>
     <string name="home_terminal_description">Uruchamiaj komendy przez Shizuku w aplikacjach terminala jakie lubisz</string>
-    <string name="home_learn_more_description">Dowiedz się, jak programować za pomocą Shizuku</string>
     <string name="terminal_tutorial_1">Po pierwsze, Wyeksportuj pliki gdzie chcesz. Znajdziesz tam dwa pliki, %1$s i %2$s.</string>
     <plurals name="home_app_management_authorized_apps_count">
         <item quantity="one">Autoryzowano aplikację %d</item>

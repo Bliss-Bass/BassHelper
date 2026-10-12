@@ -37,8 +37,6 @@
     <string name="app_management_item_summary_requires_root">* vyžaduje spustit Shizuku s rootem</string>
     <string name="app_management_dialog_adb_is_limited_message">Je vysoce možné, že výrobce vašeho zařízení omezuje oprávnění adb. &lt;p&gt; V &lt;b&gt; &lt;a href=\"%1$s\"&gt; tomto dokumentu &lt;/a&gt; &lt;/b&gt; může být pro váš systém řešení.</string>
     <string name="app_management_dialog_adb_is_limited_title">Oprávnění adb je omezené</string>
-    <string name="home_learn_more_description">Naučte se, jak vyvíjet aplikace s pomocí Shizuku</string>
-    <string name="home_learn_more_title">Naučte se Shizuku</string>
     <string name="home_app_management_view_authorized_apps">Klepnutím můžete spravovat autorizované aplikace</string>
     <plurals name="home_app_management_authorized_apps_count">
         <item quantity="one">Autorizovaná %d aplikace</item>

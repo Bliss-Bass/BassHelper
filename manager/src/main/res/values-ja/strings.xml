@@ -29,7 +29,6 @@
     <string name="home_terminal_description">Shizukuを介して、好きなターミナルアプリでコマンドを実行する</string>
     <string name="home_app_management_title">アプリケーション管理</string>
     <string name="home_app_management_view_authorized_apps">タップで許可されたアプリを管理</string>
-    <string name="home_learn_more_title">Shizukuについて学ぶ</string>
     <string name="home_root_button_start">開始</string>
     <string name="home_root_button_restart">再起動</string>
     <string name="home_root_description">また、起動時にShizukuを自動的に起動することもできます。もし、起動しない場合は、システムやサードパーティのツールがShizukuを制限していないか確認してください。&lt;br&gt;一部古い情報ですが%sを参考にしてください。</string>
@@ -69,7 +68,6 @@
     <string name="home_status_service_not_running">%1$s は停止中</string>
     <string name="home_status_service_version_update">バージョン %2$s, %1$s&lt;br&gt;バージョン %3$s にアップデートするには、再度起動してください</string>
     <string name="translation_contributors">IMES-mitutti</string>
-    <string name="home_learn_more_description">Shizukuを使った開発方法、Shizukuを使ったアプリの入手方法について学ぶことができます</string>
     <string name="app_management_dialog_adb_is_limited_title">adbの権限が制限されています</string>
     <string name="app_management_dialog_adb_is_limited_message">端末の製造元がadbの権限を制限している可能性が高いです。&lt;p&gt; &lt;b&gt;&lt;a href=\"%1$s\"&gt;このドキュメント&lt;/a&gt;&lt;/b&gt;の中に、あなたのシステムに合った解決策があるかもしれません。</string>
     <string name="app_management_item_summary_requires_root">* root権限でShizukuを実行する必要があります</string>

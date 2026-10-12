@@ -24,7 +24,6 @@ class HomeAdapter(private val homeModel: HomeViewModel, private val appsModel: A
         private const val ID_START_ROOT = 3L
         private const val ID_START_WADB = 4L
         private const val ID_START_ADB = 5L
-        private const val ID_LEARN_MORE = 6L
         private const val ID_ADB_PERMISSION_LIMITED = 7L
     }
 
@@ -69,7 +68,6 @@ class HomeAdapter(private val homeModel: HomeViewModel, private val appsModel: A
                 addItem(StartRootViewHolder.CREATOR, rootRestart, ID_START_ROOT)
             }
         }
-        addItem(LearnMoreViewHolder.CREATOR, null, ID_LEARN_MORE)
         notifyDataSetChanged()
     }
 }

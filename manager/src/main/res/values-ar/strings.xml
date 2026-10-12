@@ -52,8 +52,6 @@
 \n
 \nقد تحتاج إلى إعادة تشغيل Shizuku حتى تدخل العملية حيز التنفيذ.</string>
     <string name="home_adb_is_limited_title">أنت بحاجة إلى اتخاذ خطوة إضافية</string>
-    <string name="home_learn_more_description">تعلم كيف تطور مع Shizuku</string>
-    <string name="home_learn_more_title">معلومات عن Shizuku</string>
     <string name="home_app_management_empty">ستظهر هنا التطبيقات التي تتطلب Shizuku.</string>
     <string name="home_app_management_view_authorized_apps">انقر لإدارة التطبيقات المصرح بها</string>
     <plurals name="home_app_management_authorized_apps_count">

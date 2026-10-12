@@ -68,8 +68,6 @@
     <string name="settings_language">Sprache</string>
     <string name="settings_title">Einstellungen</string>
     <string name="app_management_item_summary_requires_root">* erfordert, dass Shizuku mit Root läuft</string>
-    <string name="home_learn_more_description">Lernen Sie, wie Apps mit Shizuku entwickelt werden</string>
-    <string name="home_learn_more_title">Shizuku kennenlernen</string>
     <string name="home_app_management_view_authorized_apps">Tippen, um autorisierte Apps zu verwalten</string>
     <string name="home_app_management_title">App-Verwaltung</string>
     <string name="home_root_button_restart">Neustart</string>

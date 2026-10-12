@@ -73,9 +73,6 @@
     <string name="home_app_management_view_authorized_apps"><![CDATA[Tap to manage authorized apps]]></string>
     <string name="home_app_management_empty">Apps that has requested or declared Shizuku will show here.</string>
 
-    <!-- Home - Learn more -->
-    <string name="home_learn_more_title">Learn Shizuku</string>
-    <string name="home_learn_more_description">Learn how to develop with Shizuku</string>
 
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">You need to take an extra step</string>

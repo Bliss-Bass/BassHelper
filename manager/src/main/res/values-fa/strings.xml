@@ -66,9 +66,6 @@
     </plurals>
     <string name="home_app_management_view_authorized_apps"><![CDATA[برای مدیریت برنامه های مجاز ضربه بزنید]]></string>
     <string name="home_app_management_empty">برنامه‌هایی که Shizuku را درخواست کرده یا اعلام کرده‌اند در اینجا نشان داده می‌شوند.</string>
-    <!-- Home - Learn more -->
-    <string name="home_learn_more_title">یادگیری Shizuku</string>
-    <string name="home_learn_more_description">یاد بگیرید که چگونه با Shizuku توسعه دهید</string>
     <!-- Home - Adb permissions limited -->
     <string name="home_adb_is_limited_title">شما باید یک قدم اضافی بردارید</string>
     <string name="home_adb_is_limited_description">سازنده دستگاه شما مجوزهای adb را محدود کرده است و برنامه هایی که از Shizuku استفاده می کنند به درستی کار نمی کنند.\n\nمعمولاً با تنظیم برخی از گزینه‌ها در \"گزینه‌های توسعه دهنده\" می‌توان این محدودیت را برطرف کرد. لطفاً راهنما را برای جزئیات نحوه انجام این کار بخوانید.\n\nشاید لازم باشد Shizuku را مجدداً راه اندازی کنید تا عملیات اجرایی شود.</string>

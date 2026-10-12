@@ -11,8 +11,6 @@
     <string name="notification_channel_service_status">Статус запуску серав</string>
     <string name="home_adb_dialog_view_command_copy_button">Копіювати</string>
     <string name="dialog_cannot_open_browser_title">Не вдається запустити браузер</string>
-    <string name="home_learn_more_title">Вивчіть Shizuku</string>
-    <string name="home_learn_more_description">Дізнайтеся, як розробляти з Shizuku</string>
     <string name="notification_service_start_failed">Помилка запуску служби Shizuku.</string>
     <string name="notification_service_start_no_root">Помилка запиту на root доступ.</string>
     <string name="notification_service_starting">Сервіс Shizuku запущено…</string>
