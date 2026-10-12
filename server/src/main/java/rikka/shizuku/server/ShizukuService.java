@@ -11,12 +11,14 @@ import static rikka.shizuku.ShizukuApiConstants.BIND_APPLICATION_SERVER_VERSION;
 import static rikka.shizuku.ShizukuApiConstants.BIND_APPLICATION_SHOULD_SHOW_REQUEST_PERMISSION_RATIONALE;
 import static rikka.shizuku.server.ServerConstants.MANAGER_APPLICATION_ID;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.IContentProvider;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.UserInfo;
 import android.ddm.DdmHandleAppName;
 import android.os.Binder;
 import android.os.Bundle;
@@ -32,8 +34,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import moe.shizuku.api.BinderContainer;
 import moe.shizuku.common.util.OsUtils;
@@ -72,13 +76,35 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         }
     }
 
+    /**
+     * Running users. getUserIdsNoThrow() falls back to user 0 alone when IUserManager#getUsers
+     * fails, so the foreground user is added; in headless system user mode that is where apps live.
+     */
+    public static Set<Integer> userIds() {
+        Set<Integer> ids = new LinkedHashSet<>();
+        try {
+            for (UserInfo user : UserManagerApis.getUsers(true, true, true)) {
+                ids.add(user.id);
+            }
+        } catch (Throwable tr) {
+            LOGGER.w(tr, "getUsers");
+            ids.add(0);
+        }
+        try {
+            ids.add((Integer) ActivityManager.class.getMethod("getCurrentUser").invoke(null));
+        } catch (Throwable tr) {
+            LOGGER.w(tr, "getCurrentUser");
+        }
+        return ids;
+    }
+
     /** User 0 first; headless system user mode (desktop builds) installs apps for the foreground user only. */
     public static ApplicationInfo getManagerApplicationInfo() {
         ApplicationInfo ai = PackageManagerApis.getApplicationInfoNoThrow(MANAGER_APPLICATION_ID, 0, 0);
         if (ai != null) {
             return ai;
         }
-        for (int userId : UserManagerApis.getUserIdsNoThrow()) {
+        for (int userId : userIds()) {
             ai = PackageManagerApis.getApplicationInfoNoThrow(MANAGER_APPLICATION_ID, 0, userId);
             if (ai != null) {
                 return ai;
@@ -280,7 +306,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         List<PackageInfo> list = new ArrayList<>();
         List<Integer> users = new ArrayList<>();
         if (userId == -1) {
-            users.addAll(UserManagerApis.getUserIdsNoThrow());
+            users.addAll(userIds());
         } else {
             users.add(userId);
         }
@@ -311,7 +337,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
     }
 
     void sendBinderToClient() {
-        for (int userId : UserManagerApis.getUserIdsNoThrow()) {
+        for (int userId : userIds()) {
             sendBinderToClient(this, userId);
         }
     }
@@ -329,7 +355,7 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
     }
 
     private static void sendBinderToManger(Binder binder) {
-        for (int userId : UserManagerApis.getUserIdsNoThrow()) {
+        for (int userId : userIds()) {
             sendBinderToManger(binder, userId);
         }
     }
