@@ -36,7 +36,7 @@ class HomeAdapter(private val homeModel: HomeViewModel, private val appsModel: A
         val grantedCount = appsModel.grantedCount.value?.data ?: 0
         val adbPermission = status.permission
         val running = status.isRunning
-        val isPrimaryUser = UserHandleCompat.myUserId() == 0
+        val canStart = UserHandleCompat.canStartServer()
 
         clear()
         addItem(ServerStatusViewHolder.CREATOR, status, ID_STATUS)
@@ -50,7 +50,7 @@ class HomeAdapter(private val homeModel: HomeViewModel, private val appsModel: A
             addItem(AdbPermissionLimitedViewHolder.CREATOR, status, ID_ADB_PERMISSION_LIMITED)
         }
 
-        if (isPrimaryUser) {
+        if (canStart) {
             val root = EnvironmentUtils.isRooted()
             val rootRestart = running && status.uid == 0
 

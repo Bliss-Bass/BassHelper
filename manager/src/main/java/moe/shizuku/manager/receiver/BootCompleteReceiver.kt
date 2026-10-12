@@ -34,7 +34,7 @@ class BootCompleteReceiver : BroadcastReceiver() {
             return
         }
 
-        if (UserHandleCompat.myUserId() > 0 || Shizuku.pingBinder()) return
+        if (!UserHandleCompat.canStartServer() || Shizuku.pingBinder()) return
 
         if (ShizukuSettings.getLastLaunchMode() == LaunchMethod.ROOT) {
             rootStart(context)
