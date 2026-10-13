@@ -1,8 +1,13 @@
 package moe.shizuku.manager
 
+import android.os.Binder
 import android.os.Bundle
+import android.os.Process
 import androidx.core.os.bundleOf
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import moe.shizuku.api.BinderContainer
+import moe.shizuku.manager.adb.WirelessAdb
 import moe.shizuku.manager.utils.Logger.LOGGER
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuApiConstants.USER_SERVICE_ARG_TOKEN
@@ -17,6 +22,24 @@ class ShizukuManagerProvider : ShizukuProvider() {
     companion object {
         private const val EXTRA_BINDER = "moe.shizuku.privileged.api.intent.extra.BINDER"
         private const val METHOD_SEND_USER_SERVICE = "sendUserService"
+
+        /** `content call --user <id> --uri content://com.blisscolabs.basshelper.shizuku --method pairAdbKey` */
+        private const val METHOD_PAIR_ADB_KEY = "pairAdbKey"
+        private const val PAIR_TIMEOUT_MS = 60_000L
+        private const val SHELL_APP_ID = 2000
+    }
+
+    // Deployers run as the shell user; no app may make Bass Helper add a trusted adb key.
+    private fun pairAdbKey(): Bundle {
+        val appId = Binder.getCallingUid() % 100000
+        if (appId != SHELL_APP_ID && appId != Process.ROOT_UID) {
+            throw SecurityException("pairAdbKey is limited to the shell user")
+        }
+        val result = runBlocking {
+            withTimeoutOrNull(PAIR_TIMEOUT_MS) { WirelessAdb.pairSelf(context!!) } ?: "failed: timed out"
+        }
+        LOGGER.i("pairAdbKey: $result")
+        return bundleOf("result" to result)
     }
 
     override fun onCreate(): Boolean {
@@ -25,6 +48,7 @@ class ShizukuManagerProvider : ShizukuProvider() {
     }
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
+        if (method == METHOD_PAIR_ADB_KEY) return pairAdbKey()
         if (extras == null) return null
 
         return if (method == METHOD_SEND_USER_SERVICE) {

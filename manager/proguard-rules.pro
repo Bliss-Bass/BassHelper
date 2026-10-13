@@ -32,6 +32,11 @@
     public static void main(java.lang.String[]);
 }
 
+# Called by reflection in WirelessAdb (runs `service call adb` as the shell user)
+-keepclassmembers class rikka.shizuku.Shizuku {
+    private static rikka.shizuku.ShizukuRemoteProcess newProcess(java.lang.String[], java.lang.String[], java.lang.String);
+}
+
 # Entrance of user service starter
 -keep class moe.shizuku.starter.ServiceStarter {
     public static void main(java.lang.String[]);

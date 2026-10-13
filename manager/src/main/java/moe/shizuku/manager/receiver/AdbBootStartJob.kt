@@ -12,23 +12,19 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import moe.shizuku.manager.AppConstants
 import moe.shizuku.manager.MainActivity
 import moe.shizuku.manager.R
 import moe.shizuku.manager.ShizukuSettings
 import moe.shizuku.manager.adb.AdbClient
-import moe.shizuku.manager.adb.AdbKey
 import moe.shizuku.manager.adb.AdbMdns
-import moe.shizuku.manager.adb.PreferenceAdbKeyStore
+import moe.shizuku.manager.adb.WirelessAdb
 import moe.shizuku.manager.starter.Starter
 import rikka.shizuku.Shizuku
 
@@ -79,26 +75,14 @@ class AdbBootStartJob : JobService() {
     }
 
     private suspend fun startOverAdb(): Boolean {
-        val cr = contentResolver
-        Settings.Global.putInt(cr, "adb_wifi_enabled", 1)
-        Settings.Global.putInt(cr, Settings.Global.ADB_ENABLED, 1)
-        Settings.Global.putLong(cr, "adb_allowed_connection_time", 0L)
-
-        val found = CompletableDeferred<Int>()
-        val mdns = AdbMdns(this, AdbMdns.TLS_CONNECT) { port -> if (port > 0) found.complete(port) }
-        mdns.start()
-        val port = try {
-            withTimeoutOrNull(MDNS_TIMEOUT_MS) { found.await() }
-        } finally {
-            mdns.stop()
-        }
+        WirelessAdb.enable(contentResolver)
+        val port = WirelessAdb.discoverPort(this, AdbMdns.TLS_CONNECT)
         if (port == null) {
             Log.w(AppConstants.TAG, "Wireless debugging port not advertised")
             return false
         }
         return try {
-            val key = AdbKey(PreferenceAdbKeyStore(ShizukuSettings.getPreferences()), "basshelper")
-            AdbClient("127.0.0.1", port, key).use {
+            AdbClient("127.0.0.1", port, WirelessAdb.key()).use {
                 it.connect()
                 it.shellCommand(Starter.internalCommand, null)
             }
@@ -138,7 +122,6 @@ class AdbBootStartJob : JobService() {
         private const val JOB_ID = 1001
         private const val KEY_ATTEMPTS = "boot_start_attempts"
         private const val MAX_ATTEMPTS = 8
-        private const val MDNS_TIMEOUT_MS = 15_000L
 
         fun schedule(context: Context) {
             ShizukuSettings.getPreferences().edit().remove(KEY_ATTEMPTS).apply()
