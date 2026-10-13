@@ -7,8 +7,8 @@
 
         <rikka.material.preference.MaterialSwitchPreference
             android:key="start_on_boot"
-            android:summary="@string/settings_start_on_boot_summary"
-            android:title="@string/settings_start_on_boot" />
+            android:summary="@string/settings_start_on_boot_any_summary"
+            android:title="@string/settings_start_on_boot_any" />
 
     </PreferenceCategory>
 
