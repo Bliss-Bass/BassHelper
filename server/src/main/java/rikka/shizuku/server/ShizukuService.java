@@ -28,6 +28,7 @@ import android.os.Looper;
 import android.os.Parcel;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,9 @@ import rikka.shizuku.server.util.HandlerUtil;
 import rikka.shizuku.server.util.UserHandleCompat;
 
 public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuClientManager, ShizukuConfigManager> {
+
+    /** ActivityManager waits up to 20 s for a provider to be published; a missing one returns at once. */
+    private static final long PROVIDER_WAIT_TIMED_OUT_MS = 5_000;
 
     public static void main(String[] args) {
         DdmHandleAppName.setAppName("bass_helper_server", 0);
@@ -394,9 +398,20 @@ public class ShizukuService extends Service<ShizukuUserServiceManager, ShizukuCl
         IBinder token = null;
 
         try {
+            long requested = SystemClock.uptimeMillis();
             provider = ActivityManagerApis.getContentProviderExternal(name, userId, token, name);
             if (provider == null) {
                 LOGGER.e("provider is null %s %d", name, userId);
+
+                // Null comes back at once for a missing provider or a locked user. Only a wait that
+                // timed out means the app's process start was abandoned (seen during app updates),
+                // which leaves the app without a process until it is stopped and started again.
+                if (retry && SystemClock.uptimeMillis() - requested >= PROVIDER_WAIT_TIMED_OUT_MS) {
+                    ActivityManagerApis.forceStopPackageNoThrow(packageName, userId);
+                    LOGGER.e("kill %s in user %d and try again", packageName, userId);
+                    Thread.sleep(1000);
+                    sendBinderToUserApp(binder, packageName, userId, false);
+                }
                 return;
             }
             if (!provider.asBinder().pingBinder()) {
