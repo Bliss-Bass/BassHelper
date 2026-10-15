@@ -1,84 +1,113 @@
-# Shizuku
+# Bass Helper
 
-## Background
+Bass Helper gives Bass and Bliss apps, such as SmartDock, the system access they need on devices that are not running a Bass or Bliss ROM: retail Android tablets, Googlebooks and other stock devices, with or without root.
 
-When developing apps that requires root, the most common method is to run some commands in the su shell. For example, there is an app that uses the `pm enable/disable` command to enable/disable components.
+It runs a small privileged server as the shell user (the same identity `adb shell` has) or as root, and hands a binder to that server to a fixed list of Bass apps. Those apps then call system APIs through it — `IPackageManager`, `IActivityManager`, settings, `cmd` and so on — with shell privileges, without root and without each app asking the user for anything.
 
-This method has very big disadvantages:
+Bass Helper started as a fork of [Shizuku](https://github.com/RikkaApps/Shizuku) 13.6 and keeps Shizuku's protocol, so client apps use the standard Shizuku API library. It is maintained separately for the Bass and Bliss ecosystem.
 
-1. **Extremely slow** (Multiple process creation)
-2. Needs to process texts (**Super unreliable**)
-3. The possibility is limited to available commands
-4. Even if ADB has sufficient permissions, the app requires root privileges to run
+## How it differs from Shizuku
 
-Shizuku uses a completely different way. See detailed description below.
+- **Serves only Bass apps.** The server answers only the packages in [`BassAllowList`](server/src/main/java/rikka/shizuku/server/BassAllowList.java). They are allowed without a prompt; any other app gets no binder and its permission requests are refused. There is no per-app grant screen to manage.
+- **Installs next to stock Shizuku.** Bass Helper has its own package (`com.blisscolabs.basshelper`), permissions, server process (`bass_helper_server`) and client provider authority (`<client package>.basshelper`), so a user's own Shizuku and the apps it serves are left alone.
+- **Starts itself on boot without root.** On Android 13 and later it starts over wireless debugging with its own adb key; see [Starting the server](#starting-the-server).
+- **Restarts itself.** The server runs under a supervisor and a watchdog; see [Keeping the server running](#keeping-the-server-running).
+- **Works on desktop-style Android.** On headless system user devices (where user 0 is a background "System" user and apps live in the foreground user, as on Googlebooks) the server finds the app in whichever user has it, and the foreground user can start it.
+- **Is deployed, not hand-configured.** A deployer with adb access installs it, starts it and pairs it for start on boot in one pass, with nothing to tap on the device.
 
-## User guide & Download
+## How it works
 
-<https://shizuku.rikka.app/>
+Apps reach system services over binder IPC: `PackageManager#getInstalledPackages()` is really a call into `PackageManagerService` in `system_server`, which checks the caller's uid before doing the work.
 
-## How does Shizuku work?
+Bass Helper runs a server process as the shell user (uid 2000) or root. When an allow-listed app starts, the server sends it a binder through the app's `.basshelper` content provider. The app then sends its system API calls to the server, which makes them with its own identity and returns the results (see `transactRemote` in [`ShizukuService`](server/src/main/java/rikka/shizuku/server/ShizukuService.java)). To the app, it looks almost the same as calling the system API directly, but with the shell user's permissions.
 
-First, we need to talk about how app use system APIs. For example, if the app wants to get installed apps, we all know we should use `PackageManager#getInstalledPackages()`. This is actually an interprocess communication (IPC) process of the app process and system server process, just the Android framework did the inner works for us.
+The pieces:
 
-Android uses `binder` to do this type of IPC. `Binder` allows the server-side to learn the uid and pid of the client-side, so that the system server can check if the app has the permission to do the operation.
+| Part | What it is |
+|------|------------|
+| `manager/` | The Bass Helper app: starts the server, start on boot, settings |
+| `manager/src/main/jni/starter.cpp` | `libbasshelper.so`, the native starter run by adb or root; it launches `bass_helper_server` through `app_process` under a supervisor |
+| `server/` | The server (`rikka.shizuku.server.ShizukuService`), allow-list and watchdog |
+| `api/` | The Shizuku API submodule, shared by server and clients |
 
-Usually, if there is a "manager" (e.g., `PackageManager`) for apps to use, there should be a "service" (e.g., `PackageManagerService`) in the system server process. We can simply think if the app holds the `binder` of the "service", it can communicate with the "service". The app process will receive binders of system services on start.
+## Starting the server
 
-Shizuku guides users to run a process, Shizuku server, with root or ADB first. When the app starts, the `binder` to Shizuku server will also be sent to the app.
+Any one of these starts it; each replaces a server that is already running.
 
-The most important feature Shizuku provides is something like be a middle man to receive requests from the app, sent them to the system server, and send back the results. You can see the `transactRemote` method in `rikka.shizuku.server.ShizukuService` class, and `moe.shizuku.api.ShizukuBinderWrapper` class for the detail.
+- **From a computer.** `adb shell` into the device and run the starter from the app's library directory:
 
-So, we reached our goal, to use system APIs with higher permission. And to the app, it is almost identical to the use of system APIs directly.
+  ```sh
+  adb shell 'dir=$(pm path --user current com.blisscolabs.basshelper | sed "s/^package://; s/base.apk$//"); $dir/lib/*/libbasshelper.so'
+  ```
 
-## Developer guide
+- **From the app.** On Android 11 and later, pair Bass Helper under Wireless debugging once, then start it from the app. On rooted devices it starts with root.
+- **From a deployer.** A deployment script running as the adb shell installs Bass Helper for the current user (`pm install -r -g --user current`), grants it `android.permission.WRITE_SECURE_SETTINGS` (`pm grant`), runs the starter as above and pairs its adb key (below), so it starts on boot from then on.
+- **On boot.** With start on boot enabled (the default) and `WRITE_SECURE_SETTINGS` granted (the deployer grants it), Bass Helper turns on wireless debugging after boot, finds adbd's port over mDNS and connects to it with its own key. Boot broadcasts arrive before Wi-Fi is up, so it waits for a network and retries with backoff, and posts a notification if it cannot start. Rooted devices start with root instead.
 
-### API & sample
+  The adb key has to be paired with the device once. A deployer does that over adb with `content call --uri content://com.blisscolabs.basshelper.shizuku --method pairAdbKey` (only the shell user may call it); Bass Helper then accepts its own pairing request the same way Android Studio's QR pairing works, with nobody reading a code off the screen.
 
-https://github.com/RikkaApps/Shizuku-API
+## Keeping the server running
 
-### Migrating from pre-v11
+- **Supervisor.** The starter does not hand the server to the system and exit; it leaves a small `bass_helper_supervisor` process that waits on the server and starts a new one 5 seconds after it crashes or is killed. A server that ran for at least a minute resets the count; after 5 failures in a row the supervisor gives up. Stop in the app (a clean exit) and an uninstalled app end supervision. After an app update the supervisor finds the new APK before restarting.
+- **Watchdog.** Inside the server, `ServerWatchdog` exits the server if its main thread stops responding for a minute, or if a core system service (`package`, `activity`, `user`, `appops`) dies — a `system_server` restart would otherwise leave the server holding dead binders. The supervisor then starts a fresh server, which waits for those services to come back.
 
-> Existing applications still works, of course.
+## Using Bass Helper from an app
 
-https://github.com/RikkaApps/Shizuku-API#migration-guide-for-existing-applications-use-shizuku-pre-v11
+1. Add the package to [`BassAllowList`](server/src/main/java/rikka/shizuku/server/BassAllowList.java).
+2. Use the [Shizuku API](https://github.com/RikkaApps/Shizuku-API) library as you would for Shizuku.
+3. Declare a second provider at `${applicationId}.basshelper` that accepts the binder. Stock `ShizukuProvider` keeps the first living binder it gets, so if the app may also see stock Shizuku, subclass it and let Bass Helper's binder replace that one:
 
-### Attention
+   ```kotlin
+   class BassHelperProvider : ShizukuProvider() {
+       override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
+           if (method != METHOD_SEND_BINDER || extras == null) return super.call(method, arg, extras)
+           extras.classLoader = BinderContainer::class.java.classLoader
+           val binder = extras.getParcelable<BinderContainer>("moe.shizuku.privileged.api.intent.extra.BINDER")?.binder
+           if (binder == null || !binder.pingBinder()) return super.call(method, arg, extras)
+           Shizuku.onBinderReceived(binder, context!!.packageName)
+           return Bundle()
+       }
+   }
+   ```
 
-1. ADB permissions are limited
+   ```xml
+   <provider
+       android:name=".BassHelperProvider"
+       android:authorities="${applicationId}.basshelper"
+       android:multiprocess="false"
+       android:enabled="true"
+       android:exported="true"
+       android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+   ```
 
-   ADB has limited permissions and different on various system versions. You can see permissions granted to ADB [here](https://github.com/aosp-mirror/platform_frameworks_base/blob/master/packages/Shell/AndroidManifest.xml).
+Things to keep in mind:
 
-   Before calling the API, you can use `ShizukuService#getUid` to check if Shizuku is running user ADB, or use `ShizukuService#checkPermission` to check if the server has sufficient permissions.
+- The shell user's permissions are limited and vary by Android version; see the Shell app's [manifest](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/packages/Shell/AndroidManifest.xml). Use `Shizuku.getUid()` to tell shell from root, and `Shizuku.checkRemotePermission()` before relying on a permission.
+- Hidden APIs are restricted for apps since Android 9; use something like [AndroidHiddenApiBypass](https://github.com/LSPosed/AndroidHiddenApiBypass).
+- System interfaces and transaction codes change between Android versions. Prefer `ShizukuBinderWrapper` around the real AIDL interface over hand-written `transactRemote` calls.
 
-2. Hidden API limitation from Android 9
-
-   As of Android 9, the usage of the hidden APIs is limited for normal apps. Please use other methods (such as <https://github.com/LSPosed/AndroidHiddenApiBypass>).
-
-3. Android 8.0 & ADB
-
-   At present, the way Shizuku service gets the app process is to combine `IActivityManager#registerProcessObserver` and `IActivityManager#registerUidObserver` (26+) to ensure that the app process will be sent when the app starts. However, on API 26, ADB lacks permissions to use `registerUidObserver`, so if you need to use Shizuku in a process that might not be started by an Activity, it is recommended to trigger the send binder by starting a transparent activity.
-
-4. Direct use of `transactRemote` requires attention
-
-   * The API may be different under different Android versions, please be sure to check it carefully. Also, the `android.app.IActivityManager` has the aidl form in API 26 and later, and `android.app.IActivityManager$Stub` exists only on API 26.
-
-   * `SystemServiceHelper.getTransactionCode` may not get the correct transaction code, such as `android.content.pm.IPackageManager$Stub.TRANSACTION_getInstalledPackages` does not exist on API 25 and there is `android.content.pm.IPackageManager$Stub.TRANSACTION_getInstalledPackages_47` (this situation has been dealt with, but it is not excluded that there may be other circumstances). This problem is not encountered with the `ShizukuBinderWrapper` method.
-
-## Developing Shizuku itself
-
-### Build
+## Building
 
 - Clone with `git clone --recurse-submodules`
-- Run gradle task `:manager:assembleDebug` or `:manager:assembleRelease`
+- Run `./gradlew :manager:assembleDebug` or `./gradlew :manager:assembleRelease`
 
-The `:manager:assembleDebug` task generates a debuggable server. You can attach a debugger to `shizuku_server` to debug the server. Be aware that, in Android Studio, "Run/Debug configurations" - "Always install with package manager" should be checked, so that the server will use the latest code.
+The debug build has a debuggable server: attach a debugger to `bass_helper_server`. In Android Studio, check "Always install with package manager" under Run/Debug configurations so the server uses the latest code.
+
+Server, supervisor and starter logs: `adb logcat -s Service BinderSender Shizuku ServerWatchdog`.
+
+## Credits
+
+Bass Helper is built on [Shizuku](https://github.com/RikkaApps/Shizuku) by RikkaApps and its contributors. It also adapts:
+
+- The starter's server supervisor and the server watchdog from [Nightzuku](https://github.com/kerneldroid/Nightzuku) by kerneldroid (Apache-2.0).
 
 ## License
 
 The code for this project is available under the Apache-2.0 license.
 
 ### Exceptions
+
+These terms come from Shizuku and still apply to the parts derived from it.
 
 * You are **FORBIDDEN** to use image files listed below in any way (unless for displaying Shizuku itself).
 
@@ -96,6 +125,8 @@ The code for this project is available under the Apache-2.0 license.
   manager/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png
   manager/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png
   ```
+
+  Bass Helper no longer ships these files; it has its own icon.
 
 * For the project as a whole, it is not free.
 You are **FORBIDDEN** to distribute the apk compiled by **you**
