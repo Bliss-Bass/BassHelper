@@ -22,6 +22,7 @@ class BootCompleteReceiver : BroadcastReceiver() {
             && Intent.ACTION_BOOT_COMPLETED != intent.action) {
             return
         }
+        ShizukuSettings.setUserStopped(false)
 
         if (!UserHandleCompat.canStartServer() || Shizuku.pingBinder()) return
 

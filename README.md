@@ -52,6 +52,7 @@ Any one of these starts it; each replaces a server that is already running.
 
 - **Supervisor.** The starter does not hand the server to the system and exit; it leaves a small `bass_helper_supervisor` process that waits on the server and starts a new one 5 seconds after it crashes or is killed. A server that ran for at least a minute resets the count; after 5 failures in a row the supervisor gives up. Stop in the app (a clean exit) and an uninstalled app end supervision. After an app update the supervisor finds the new APK before restarting.
 - **Watchdog.** Inside the server, `ServerWatchdog` exits the server if its main thread stops responding for a minute, or if a core system service (`package`, `activity`, `user`, `appops`) dies — a `system_server` restart would otherwise leave the server holding dead binders. The supervisor then starts a fresh server, which waits for those services to come back.
+- **Start requests from apps.** If the server stays down (the supervisor gave up, or the device rebooted onto a network where start on boot failed), an allow-listed app can ask Bass Helper to start it again over wireless debugging (see below). Bass Helper refuses when the user pressed Stop in the app, until the server is started again or the device reboots, and when start on boot is turned off.
 
 ## Using Bass Helper from an app
 
@@ -81,6 +82,16 @@ Any one of these starts it; each replaces a server that is already running.
        android:exported="true"
        android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
    ```
+
+4. Optionally, when the binder dies and does not come back within a few seconds of the supervisor's restart, ask Bass Helper to start the server. Call this off the main thread; it can take a few seconds:
+
+   ```kotlin
+   val result = context.contentResolver.call(
+       Uri.parse("content://com.blisscolabs.basshelper.control"), "start", null, null
+   )?.getString("result")
+   ```
+
+   `result` is `running`, `scheduled`, `stopped_by_user`, `auto_start_disabled` or `failed: <reason>`. The `status` method returns the same bundle without `result`: `running`, `user_stopped` and `start_on_boot`. Only allow-listed apps (and the shell) may call either method; the app needs to see Bass Helper's package (a `<queries>` entry for `com.blisscolabs.basshelper` on Android 11 and later).
 
 Things to keep in mind:
 

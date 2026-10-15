@@ -180,6 +180,13 @@
         </receiver>
 
         <provider
+            android:name=".ControlProvider"
+            android:authorities="${applicationId}.control"
+            android:directBootAware="true"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
+
+        <provider
             android:name=".ShizukuManagerProvider"
             android:authorities="${applicationId}.shizuku"
             android:directBootAware="true"

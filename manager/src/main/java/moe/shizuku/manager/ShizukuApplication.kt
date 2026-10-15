@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.topjohnwu.superuser.Shell
 import moe.shizuku.manager.ktx.logd
 import org.lsposed.hiddenapibypass.HiddenApiBypass
+import rikka.shizuku.Shizuku
 import rikka.core.util.BuildUtils.atLeast30
 import rikka.material.app.LocaleDelegate
 
@@ -39,6 +40,7 @@ class ShizukuApplication : Application() {
         super.onCreate()
         application = this
         init(this)
+        Shizuku.addBinderReceivedListenerSticky { ShizukuSettings.setUserStopped(false) }
     }
 
 }

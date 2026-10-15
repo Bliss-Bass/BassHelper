@@ -1,5 +1,7 @@
 package moe.shizuku.manager.receiver
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -31,6 +33,16 @@ import moe.shizuku.manager.adb.WirelessAdb
 import moe.shizuku.manager.starter.Starter
 import rikka.shizuku.Shizuku
 
+/** Schedules [AdbBootStartJob] now; returns "scheduled" or why it cannot. */
+fun scheduleAdbStart(context: Context): String {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return "failed: needs Android 13"
+    if (context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
+        return "failed: WRITE_SECURE_SETTINGS not granted"
+    }
+    AdbBootStartJob.schedule(context)
+    return "scheduled"
+}
+
 /**
  * Starts the server over wireless debugging after boot. Boot broadcasts usually arrive before
  * Wi-Fi connects and before adbd advertises its port, so this waits for a network and retries
@@ -60,20 +72,20 @@ class AdbBootStartJob : JobService() {
             val started = startOverAdb()
             when {
                 started -> {
-                    Log.i(AppConstants.TAG, "Started on boot over wireless debugging (attempt $attempt)")
+                    Log.i(AppConstants.TAG, "Started over wireless debugging (attempt $attempt)")
                     prefs.edit().remove(KEY_ATTEMPTS).apply()
                     onStarted()
                     jobFinished(params, false)
                 }
                 attempt >= MAX_ATTEMPTS -> {
-                    Log.w(AppConstants.TAG, "Start on boot failed after $attempt attempts, retrying on the next Wi-Fi network")
+                    Log.w(AppConstants.TAG, "Start failed after $attempt attempts, retrying on the next Wi-Fi network")
                     prefs.edit().remove(KEY_ATTEMPTS).apply()
                     notifyFailed()
                     scheduleRetry(this@AdbBootStartJob, params.network)
                     jobFinished(params, false)
                 }
                 else -> {
-                    Log.w(AppConstants.TAG, "Start on boot attempt $attempt failed, retrying")
+                    Log.w(AppConstants.TAG, "Start attempt $attempt failed, retrying")
                     prefs.edit().putInt(KEY_ATTEMPTS, attempt).apply()
                     jobFinished(params, true)
                 }
@@ -199,7 +211,7 @@ class AdbBootStartJob : JobService() {
             try {
                 context.getSystemService(JobScheduler::class.java).schedule(job)
             } catch (e: Exception) {
-                Log.w(AppConstants.TAG, "Start on boot job not scheduled", e)
+                Log.w(AppConstants.TAG, "Start job not scheduled", e)
             }
         }
     }

@@ -25,6 +25,7 @@ public class ShizukuSettings {
     public static final String NIGHT_MODE = "night_mode";
     public static final String LANGUAGE = "language";
     public static final String KEEP_START_ON_BOOT = "start_on_boot";
+    private static final String USER_STOPPED = "user_stopped";
 
     private static SharedPreferences sPreferences;
 
@@ -82,6 +83,15 @@ public class ShizukuSettings {
 
     public static void setLastLaunchMode(@LaunchMethod int method) {
         getPreferences().edit().putInt("mode", method).apply();
+    }
+
+    /** Set by Stop in the app; apps may not restart the server until it is started again or the device reboots. */
+    public static boolean isUserStopped() {
+        return getPreferences().getBoolean(USER_STOPPED, false);
+    }
+
+    public static void setUserStopped(boolean stopped) {
+        getPreferences().edit().putBoolean(USER_STOPPED, stopped).apply();
     }
 
     @AppCompatDelegate.NightMode

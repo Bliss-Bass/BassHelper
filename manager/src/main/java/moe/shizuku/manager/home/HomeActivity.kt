@@ -122,6 +122,7 @@ abstract class HomeActivity : AppBarActivity() {
                     .setMessage(R.string.dialog_stop_message)
                     .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                         try {
+                            ShizukuSettings.setUserStopped(true)
                             Shizuku.exit()
                         } catch (e: Throwable) {
                         }

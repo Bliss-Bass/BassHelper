@@ -1,9 +1,6 @@
 package moe.shizuku.manager
 
-import android.Manifest.permission.WRITE_SECURE_SETTINGS
-import android.content.pm.PackageManager
 import android.os.Binder
-import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import androidx.core.os.bundleOf
@@ -11,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import moe.shizuku.api.BinderContainer
 import moe.shizuku.manager.adb.WirelessAdb
-import moe.shizuku.manager.receiver.AdbBootStartJob
+import moe.shizuku.manager.receiver.scheduleAdbStart
 import moe.shizuku.manager.utils.Logger.LOGGER
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuApiConstants.USER_SERVICE_ARG_TOKEN
@@ -54,18 +51,9 @@ class ShizukuManagerProvider : ShizukuProvider() {
 
     private fun scheduleStart(): Bundle {
         enforceShell(METHOD_SCHEDULE_START)
-        val result = scheduleStartResult()
+        val result = scheduleAdbStart(context!!)
         LOGGER.i("scheduleStart: $result")
         return bundleOf("result" to result)
-    }
-
-    private fun scheduleStartResult(): String {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return "failed: needs Android 13"
-        if (context!!.checkSelfPermission(WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
-            return "failed: WRITE_SECURE_SETTINGS not granted"
-        }
-        AdbBootStartJob.schedule(context!!)
-        return "scheduled"
     }
 
     override fun onCreate(): Boolean {
