@@ -8,6 +8,8 @@
 #include <libgen.h>
 #include <sys/stat.h>
 #include <sys/system_properties.h>
+#include <sys/wait.h>
+#include <csignal>
 #include <cerrno>
 #include <string>
 #include <termios.h>
@@ -30,10 +32,16 @@
 #define EXIT_FATAL_PM_PATH 7
 #define EXIT_FATAL_KILL 9
 #define EXIT_FATAL_BINDER_BLOCKED_BY_SELINUX 10
+#define EXIT_MANAGER_APP_NOT_FOUND 50
 
 #define PACKAGE_NAME "com.blisscolabs.basshelper"
 #define SERVER_NAME "bass_helper_server"
+#define SUPERVISOR_NAME "bass_helper_supervisor"
 #define SERVER_CLASS_PATH "rikka.shizuku.server.ShizukuService"
+
+#define MAX_RESTARTS 5
+#define RESTART_DELAY_SECS 5
+#define STABLE_UPTIME_SECS 60
 
 #if defined(__arm__)
 #define ABI "arm"
@@ -113,7 +121,90 @@ v_current = (uintptr_t) v + v_size - sizeof(char *); \
     }
 }
 
-static void start_server(const char *path, const char *main_class, const char *process_name) {
+/** Keeps a readable apk_path, otherwise asks pm; app updates move the apk. */
+static bool resolve_apk_path(std::string &apk_path) {
+    if (!apk_path.empty() && access(apk_path.c_str(), R_OK) == 0) return true;
+    apk_path.clear();
+
+    // pm path looks in user 0; headless system user mode installs apps for the foreground user only.
+    const char *pm_path_cmds[] = {"pm path " PACKAGE_NAME, "pm path --user current " PACKAGE_NAME};
+    for (auto cmd : pm_path_cmds) {
+        auto f = popen(cmd, "r");
+        if (!f) continue;
+        char line[PATH_MAX]{0};
+        fgets(line, PATH_MAX, f);
+        pclose(f);
+        trim(line);
+        if (strstr(line, "package:") == line) {
+            apk_path = line + strlen("package:");
+            break;
+        }
+    }
+    return !apk_path.empty() && access(apk_path.c_str(), R_OK) == 0;
+}
+
+static long uptime_secs() {
+    timespec ts{};
+    clock_gettime(CLOCK_BOOTTIME, &ts);
+    return ts.tv_sec;
+}
+
+/**
+ * Runs the server and restarts it when it crashes or is killed, after Nightzuku's starter
+ * supervisor (https://github.com/kerneldroid/Nightzuku, Apache-2.0). A clean exit (Stop in the
+ * app) or a missing manager ends supervision.
+ */
+[[noreturn]] static void supervise(std::string apk_path) {
+    signal(SIGHUP, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
+
+    int restarts = 0;
+    while (true) {
+        if (!resolve_apk_path(apk_path)) {
+            LOGE("supervisor: can't find manager apk, stopping");
+            exit(EXIT_FATAL_PM_PATH);
+        }
+
+        long started = uptime_secs();
+        pid_t pid = fork();
+        if (pid == -1) {
+            PLOGE("supervisor: fork");
+            exit(EXIT_FATAL_FORK);
+        }
+        if (pid == 0) {
+            signal(SIGHUP, SIG_DFL);
+            signal(SIGPIPE, SIG_DFL);
+            run_server(apk_path.c_str(), SERVER_CLASS_PATH, SERVER_NAME);
+            _exit(EXIT_FATAL_APP_PROCESS);
+        }
+        LOGI("supervisor: %s pid is %d", SERVER_NAME, pid);
+
+        int status = 0;
+        while (waitpid(pid, &status, 0) == -1 && errno == EINTR) {}
+        long ran = uptime_secs() - started;
+
+        if (WIFEXITED(status)) {
+            int code = WEXITSTATUS(status);
+            if (code == 0 || code == EXIT_MANAGER_APP_NOT_FOUND) {
+                LOGI("supervisor: %s exited with %d, not restarting", SERVER_NAME, code);
+                exit(EXIT_SUCCESS);
+            }
+            LOGW("supervisor: %s exited with %d after %lds", SERVER_NAME, code, ran);
+        } else if (WIFSIGNALED(status)) {
+            LOGW("supervisor: %s killed by signal %d after %lds", SERVER_NAME, WTERMSIG(status), ran);
+        }
+
+        restarts = ran >= STABLE_UPTIME_SECS ? 1 : restarts + 1;
+        if (restarts > MAX_RESTARTS) {
+            LOGE("supervisor: %s failed %d times in a row, giving up", SERVER_NAME, MAX_RESTARTS);
+            exit(EXIT_FATAL_APP_PROCESS);
+        }
+        LOGW("supervisor: restarting in %ds (%d/%d)", RESTART_DELAY_SECS, restarts, MAX_RESTARTS);
+        sleep(RESTART_DELAY_SECS);
+    }
+}
+
+static void start_server(const char *path) {
     pid_t pid = fork();
     switch (pid) {
         case -1: {
@@ -131,14 +222,42 @@ static void start_server(const char *path, const char *main_class, const char *p
                 dup2(fd, STDERR_FILENO);
                 if (fd > 2) close(fd);
             }
-            run_server(path, main_class, process_name);
+            // Re-exec under its own name so the next start can find and replace it.
+            std::string apk_arg = std::string("--apk=") + path;
+            execl("/proc/self/exe", SUPERVISOR_NAME, "--supervise", apk_arg.c_str(), (char *) nullptr);
+            PLOGE("exec supervisor");
+            run_server(path, SERVER_CLASS_PATH, SERVER_NAME);
+            _exit(EXIT_FATAL_APP_PROCESS);
         }
         default: {
-            printf("info: %s pid is %d\n", SERVER_NAME, pid);
+            printf("info: %s pid is %d\n", SUPERVISOR_NAME, pid);
             printf("info: shizuku_starter exit with 0\n");
             exit(EXIT_SUCCESS);
         }
     }
+}
+
+static void kill_by_name(const char *process_name) {
+    static const char *target;
+    target = process_name;
+    foreach_proc([](pid_t pid) {
+        if (pid == getpid()) return;
+
+        char name[1024];
+        if (get_proc_name(pid, name, 1024) != 0) return;
+
+        if (strcmp(target, name) != 0)
+            return;
+
+        if (kill(pid, SIGKILL) == 0)
+            printf("info: killed %d (%s)\n", pid, name);
+        else if (errno == EPERM) {
+            perrorf("fatal: can't kill %d, please try to stop existing Bass Helper from app first.\n", pid);
+            exit(EXIT_FATAL_KILL);
+        } else {
+            printf("warn: failed to kill %d (%s)\n", pid, name);
+        }
+    });
 }
 
 static int check_selinux(const char *s, const char *t, const char *c, const char *p) {
@@ -189,6 +308,10 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (argc > 1 && strcmp(argv[1], "--supervise") == 0) {
+        supervise(apk_path);
+    }
+
     uid_t uid = getuid();
     if (uid != 0 && uid != 2000) {
         perrorf("fatal: run Bass Helper from non root nor adb user (uid=%d).\n", uid);
@@ -230,59 +353,23 @@ int main(int argc, char *argv[]) {
     printf("info: killing old process...\n");
     fflush(stdout);
 
-    foreach_proc([](pid_t pid) {
-        if (pid == getpid()) return;
-
-        char name[1024];
-        if (get_proc_name(pid, name, 1024) != 0) return;
-
-        if (strcmp(SERVER_NAME, name) != 0)
-            return;
-
-        if (kill(pid, SIGKILL) == 0)
-            printf("info: killed %d (%s)\n", pid, name);
-        else if (errno == EPERM) {
-            perrorf("fatal: can't kill %d, please try to stop existing Bass Helper from app first.\n", pid);
-            exit(EXIT_FATAL_KILL);
-        } else {
-            printf("warn: failed to kill %d (%s)\n", pid, name);
-        }
-    });
+    // Supervisor first, or it restarts the server killed below.
+    kill_by_name(SUPERVISOR_NAME);
+    kill_by_name(SERVER_NAME);
 
     if (access(apk_path.c_str(), R_OK) == 0) {
         printf("info: use apk path from argv\n");
         fflush(stdout);
     }
 
-    // pm path looks in user 0; headless system user mode installs apps for the foreground user only.
-    const char *pm_path_cmds[] = {"pm path " PACKAGE_NAME, "pm path --user current " PACKAGE_NAME};
-    for (auto cmd : pm_path_cmds) {
-        if (!apk_path.empty()) break;
-        auto f = popen(cmd, "r");
-        if (f) {
-            char line[PATH_MAX]{0};
-            fgets(line, PATH_MAX, f);
-            trim(line);
-            if (strstr(line, "package:") == line) {
-                apk_path = line + strlen("package:");
-            }
-            pclose(f);
-        }
-    }
-
-    if (apk_path.empty()) {
+    if (!resolve_apk_path(apk_path)) {
         perrorf("fatal: can't get path of manager\n");
         exit(EXIT_FATAL_PM_PATH);
     }
 
     printf("info: apk path is %s\n", apk_path.c_str());
-    if (access(apk_path.c_str(), R_OK) != 0) {
-        perrorf("fatal: can't access manager %s\n", apk_path.c_str());
-        exit(EXIT_FATAL_PM_PATH);
-    }
-
     printf("info: starting server...\n");
     fflush(stdout);
     LOGD("start_server");
-    start_server(apk_path.c_str(), SERVER_CLASS_PATH, SERVER_NAME);
+    start_server(apk_path.c_str());
 }

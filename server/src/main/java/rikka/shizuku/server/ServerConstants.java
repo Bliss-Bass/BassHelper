@@ -3,6 +3,7 @@ package rikka.shizuku.server;
 public class ServerConstants {
 
     public static final int MANAGER_APP_NOT_FOUND = 50;
+    public static final int EXIT_WATCHDOG = 70;
 
     public static final String PERMISSION = "com.blisscolabs.basshelper.permission.API";
     public static final String MANAGER_APPLICATION_ID = "com.blisscolabs.basshelper";
