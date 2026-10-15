@@ -42,7 +42,9 @@ Any one of these starts it; each replaces a server that is already running.
 
 - **From the app.** On Android 11 and later, pair Bass Helper under Wireless debugging once, then start it from the app. On rooted devices it starts with root.
 - **From a deployer.** A deployment script running as the adb shell installs Bass Helper for the current user (`pm install -r -g --user current`), grants it `android.permission.WRITE_SECURE_SETTINGS` (`pm grant`), runs the starter as above and pairs its adb key (below), so it starts on boot from then on.
-- **On boot.** With start on boot enabled (the default) and `WRITE_SECURE_SETTINGS` granted (the deployer grants it), Bass Helper turns on wireless debugging after boot, finds adbd's port over mDNS and connects to it with its own key. Boot broadcasts arrive before Wi-Fi is up, so it waits for a network and retries with backoff, and posts a notification if it cannot start. Rooted devices start with root instead.
+- **On boot.** With start on boot enabled (the default) and `WRITE_SECURE_SETTINGS` granted (the deployer grants it), Bass Helper turns on wireless debugging after boot, finds adbd's port over mDNS and connects to it with its own key. Boot broadcasts arrive before Wi-Fi is up, so it waits for a network and retries with backoff. If that fails (no Wi-Fi, or a network where wireless debugging is refused) it posts a notification and tries again whenever the device joins a different Wi-Fi network, checked every 15 minutes. Rooted devices start with root instead.
+
+  A deployer can run this path without rebooting: `content call --user <id> --uri content://com.blisscolabs.basshelper.shizuku --method scheduleStart` (shell user only).
 
   The adb key has to be paired with the device once. A deployer does that over adb with `content call --uri content://com.blisscolabs.basshelper.shizuku --method pairAdbKey` (only the shell user may call it); Bass Helper then accepts its own pairing request the same way Android Studio's QR pairing works, with nobody reading a code off the screen.
 

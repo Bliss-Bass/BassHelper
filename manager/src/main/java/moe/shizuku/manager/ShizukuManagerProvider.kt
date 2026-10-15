@@ -1,6 +1,9 @@
 package moe.shizuku.manager
 
+import android.Manifest.permission.WRITE_SECURE_SETTINGS
+import android.content.pm.PackageManager
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import androidx.core.os.bundleOf
@@ -8,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import moe.shizuku.api.BinderContainer
 import moe.shizuku.manager.adb.WirelessAdb
+import moe.shizuku.manager.receiver.AdbBootStartJob
 import moe.shizuku.manager.utils.Logger.LOGGER
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuApiConstants.USER_SERVICE_ARG_TOKEN
@@ -25,21 +29,43 @@ class ShizukuManagerProvider : ShizukuProvider() {
 
         /** `content call --user <id> --uri content://com.blisscolabs.basshelper.shizuku --method pairAdbKey` */
         private const val METHOD_PAIR_ADB_KEY = "pairAdbKey"
+        /** Runs the start-on-boot path now: `--method scheduleStart`. */
+        private const val METHOD_SCHEDULE_START = "scheduleStart"
         private const val PAIR_TIMEOUT_MS = 60_000L
         private const val SHELL_APP_ID = 2000
     }
 
-    // Deployers run as the shell user; no app may make Bass Helper add a trusted adb key.
-    private fun pairAdbKey(): Bundle {
+    private fun enforceShell(method: String) {
         val appId = Binder.getCallingUid() % 100000
         if (appId != SHELL_APP_ID && appId != Process.ROOT_UID) {
-            throw SecurityException("pairAdbKey is limited to the shell user")
+            throw SecurityException("$method is limited to the shell user")
         }
+    }
+
+    // Deployers run as the shell user; no app may make Bass Helper add a trusted adb key.
+    private fun pairAdbKey(): Bundle {
+        enforceShell(METHOD_PAIR_ADB_KEY)
         val result = runBlocking {
             withTimeoutOrNull(PAIR_TIMEOUT_MS) { WirelessAdb.pairSelf(context!!) } ?: "failed: timed out"
         }
         LOGGER.i("pairAdbKey: $result")
         return bundleOf("result" to result)
+    }
+
+    private fun scheduleStart(): Bundle {
+        enforceShell(METHOD_SCHEDULE_START)
+        val result = scheduleStartResult()
+        LOGGER.i("scheduleStart: $result")
+        return bundleOf("result" to result)
+    }
+
+    private fun scheduleStartResult(): String {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return "failed: needs Android 13"
+        if (context!!.checkSelfPermission(WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
+            return "failed: WRITE_SECURE_SETTINGS not granted"
+        }
+        AdbBootStartJob.schedule(context!!)
+        return "scheduled"
     }
 
     override fun onCreate(): Boolean {
@@ -49,6 +75,7 @@ class ShizukuManagerProvider : ShizukuProvider() {
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
         if (method == METHOD_PAIR_ADB_KEY) return pairAdbKey()
+        if (method == METHOD_SCHEDULE_START) return scheduleStart()
         if (extras == null) return null
 
         return if (method == METHOD_SEND_USER_SERVICE) {
